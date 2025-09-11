@@ -1,51 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Rabbit R1 Spotify Web Player</title>
-  <meta name="viewport" content="width=240, height=282, user-scalable=no">
+  <meta charset="UTF-8" />
+  <title>Rabbit R1 Spotify Webplayer Card</title>
+  <meta name="viewport" content="width=240, height=282, user-scalable=no"/>
   <style>
-    body, html {
+    html, body {
       width: 240px; height: 282px; margin: 0; padding: 0;
       overflow: hidden; background: #191414; color: #fff; font-family: sans-serif;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start;
     }
-    #openSpotifyBtn {
-      width: 200px; height: 50px; border-radius: 20px;
-      font-size: 1.1em; font-weight: bold;
+    #goSpotifyBtn {
+      width: 92%; height: 44px; border-radius: 14px;
+      font-size: 1em; font-weight: bold;
       background: #1db954; color: #191414;
-      border: none; margin: 0 0 10px 0; cursor: pointer;
-      transition: background 0.2s;
+      border: none; margin: 10px 0; cursor: pointer;
+      text-align: left; padding-left: 16px;
     }
-    #openSpotifyBtn:hover { background: #1ed760; }
-    .hint { font-size: 0.9em; padding: 0 12px; text-align: center; margin-bottom: 8px; }
-    .hardware { font-size: 0.8em; color: #b3b3b3; margin-top: 4px; }
+    #goSpotifyBtn:hover { background: #1ed760; }
+    .hint { font-size:0.92em; padding:10px 12px 4px 12px; text-align:left; margin-bottom: 0;}
+    .hardware { font-size: 0.80em; color: #b3b3b3; padding-left: 12px; text-align:left;}
   </style>
 </head>
 <body>
   <div class="hint">
-    <b>Use Spotify on Rabbit R1:</b><br/>
-    Simply sign in – then the official Spotify web player starts, optimized for the mini display. Full music selection, playlists & search directly like on any device!
+    <b>Spotify on Rabbit R1</b><br>
+    Tap to open the official Spotify web player. Full playlist, search & controls, all right on your Rabbit.<br>
   </div>
-  <button id="openSpotifyBtn">Open Spotify Web Player</button>
+  <button id="goSpotifyBtn">Open Spotify Web Player</button>
   <div class="hardware">
-    <b>Controls:</b><br/>
-    <span>• <b>Rabbit Button:</b> Play/Pause<br/>
-    • <b>Scroll Wheel:</b> Change volume or skip tracks (if supported)</span>
+    <b>Shortcuts:</b><br>
+    • <b>Rabbit Button:</b> Play/Pause<br>
+    • <b>Scroll Wheel:</b> Change volume or skip tracks (if supported)
   </div>
   <script>
-    document.getElementById('openSpotifyBtn').onclick = function() {
+    document.getElementById('goSpotifyBtn').onclick = function() {
+      // Weiterleitung im gleichen Fenster
       window.location.href = 'https://open.spotify.com/';
-      // Alternative, if Rabbit/Firmware supports window.open:
-      // window.open('https://open.spotify.com/', '_blank', 'width=240,height=282');
     };
-    // Tip: Hardware mapping for scroll wheel/button can be added via JS event listeners
-    // Example (depending on Rabbit webview support):
-    // window.addEventListener('keydown', function(e) {
-    //   if (e.key === ' ') { /* Play/Pause */ }
-    //   if (e.key === 'ArrowUp') { /* Vol + */ }
-    //   if (e.key === 'ArrowDown') { /* Vol - */ }
-    // });
   </script>
 </body>
 </html>
