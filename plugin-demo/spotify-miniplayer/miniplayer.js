@@ -1,12 +1,12 @@
 // ==== SPOTIFY WEBLOGIN - Multiuser-PKCE für Rabbit R1 ====
 // CLIENT_ID und REDIRECT_URI sind App-IDs; jeder meldet sich mit seinem eigenen Spotify-Konto an!
-const SPOTIFY_CLIENT_ID = 'DEIN_CLIENT_ID';      // <- deine App-ID
+const SPOTIFY_CLIENT_ID = '38d152037c7f4c5fa831171423f56e4b';      // <- deine App-ID
 const SPOTIFY_REDIRECT_URI = 'https://atomlabor.github.io/creations-sdk/plugin-demo/spotify-miniplayer/';// <- URL deiner Card, wie eingetragen!
 const SPOTIFY_SCOPES = "streaming user-read-email user-read-private user-modify-playback-state user-read-playback-state playlist-read-private";
 // --- PKCE Hilfsfunktionen ---
 function generateRandomString(length) {
   let text = '', chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  for (let i=0; i<length; ++i) text += chars.charAt(Math.floor(Math.random() * chars.length));
+  for (let i=0; i<length; i++) text += chars.charAt(Math.floor(Math.random() * chars.length));
   return text;
 }
 async function generateCodeChallenge(verifier) {
