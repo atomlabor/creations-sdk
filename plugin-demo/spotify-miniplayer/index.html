@@ -33,6 +33,31 @@
             font-size: 14px;
             margin-bottom: 4px;
         }
+        .auth-section {
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .auth-status {
+            font-size: 10px;
+            margin-bottom: 4px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .spotify-login-btn {
+            width: 100%;
+            padding: 8px;
+            background: #1db954;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: none;
+        }
+        .spotify-login-btn:hover {
+            background: #1ed760;
+        }
         .search-section {
             margin-bottom: 8px;
         }
@@ -222,6 +247,12 @@
         <div class="header">
             <h1>🎵 Spotify Mini</h1>
         </div>
+        
+        <div class="auth-section">
+            <div class="auth-status" id="authStatus">Checking authentication...</div>
+            <button class="spotify-login-btn" id="spotifyLoginBtn" onclick="requestSpotifyAuth()">Sign in with Spotify Premium</button>
+        </div>
+        
         <div class="search-section">
             <input type="text" class="search-input" id="searchInput" placeholder="Search for music..." maxlength="50">
             <div class="search-buttons">
@@ -230,6 +261,7 @@
                 <button class="search-btn" onclick="searchPlaylists()">Playlists</button>
             </div>
         </div>
+        
         <div class="current-track">
             <div id="cover-art">
                 <img id="albumCoverImg" alt="Album Cover" style="display: none;">
@@ -240,6 +272,7 @@
                 <div class="track-artist" id="currentArtist">Ready to play</div>
             </div>
         </div>
+        
         <div class="controls">
             <button class="control-btn" onclick="previousTrack()" title="Previous track">
                 ⏮️
@@ -251,6 +284,7 @@
                 ⏭️
             </button>
         </div>
+        
         <div class="results-section">
             <div class="results-header" id="resultsHeader">Search Results</div>
             <ul class="results-list" id="resultsList">
@@ -260,8 +294,10 @@
                 </li>
             </ul>
         </div>
+        
         <div class="status" id="status"></div>
     </div>
+    
     <script src="miniplayer.js"></script>
 </body>
 </html>
