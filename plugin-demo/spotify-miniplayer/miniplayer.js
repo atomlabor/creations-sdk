@@ -1,6 +1,43 @@
 // Spotify Miniplayer Plugin
 // Playlist/Album search, play commands, UI updates, and hardware integration
 
+// Global functions that can be called from HTML onclick attributes
+function searchTracks() {
+  if (window.spotifyMiniPlayer) {
+    window.spotifyMiniPlayer.performSearch('track');
+  }
+}
+
+function searchAlbums() {
+  if (window.spotifyMiniPlayer) {
+    window.spotifyMiniPlayer.performSearch('album');
+  }
+}
+
+function searchPlaylists() {
+  if (window.spotifyMiniPlayer) {
+    window.spotifyMiniPlayer.performSearch('playlist');
+  }
+}
+
+function togglePlayPause() {
+  if (window.spotifyMiniPlayer) {
+    window.spotifyMiniPlayer.togglePlayPause();
+  }
+}
+
+function previousTrack() {
+  if (window.spotifyMiniPlayer) {
+    window.spotifyMiniPlayer.previousTrack();
+  }
+}
+
+function nextTrack() {
+  if (window.spotifyMiniPlayer) {
+    window.spotifyMiniPlayer.nextTrack();
+  }
+}
+
 class SpotifyMiniPlayer {
   constructor() {
     this.currentTrack = null;
@@ -9,83 +46,21 @@ class SpotifyMiniPlayer {
     this.currentPlaylist = null;
     this.currentAlbum = null;
     
-    this.initializeUI();
     this.setupEventListeners();
     this.setupPluginMessaging();
   }
 
-  // Initialize the miniplayer UI
-  initializeUI() {
-    const playerContainer = document.createElement('div');
-    playerContainer.id = 'spotify-miniplayer';
-    playerContainer.innerHTML = `
-      <div class="player-header">
-        <h3>Spotify Miniplayer</h3>
-        <button id="minimize-btn">−</button>
-      </div>
-      
-      <div class="search-section">
-        <input type="text" id="search-input" placeholder="Search playlists/albums...">
-        <button id="search-btn">Search</button>
-      </div>
-      
-      <div class="results-section">
-        <ul id="search-results"></ul>
-      </div>
-      
-      <div class="player-controls">
-        <div class="track-info">
-          <div id="track-title">No track selected</div>
-          <div id="track-artist"></div>
-        </div>
-        
-        <div class="control-buttons">
-          <button id="prev-btn">⏮</button>
-          <button id="play-pause-btn">▶</button>
-          <button id="next-btn">⏭</button>
-          <button id="shuffle-btn">🔀</button>
-          <button id="repeat-btn">🔁</button>
-        </div>
-        
-        <div class="volume-control">
-          <span>🔊</span>
-          <input type="range" id="volume-slider" min="0" max="100" value="50">
-        </div>
-      </div>
-      
-      <div class="progress-section">
-        <input type="range" id="progress-slider" min="0" max="100" value="0">
-        <div class="time-display">
-          <span id="current-time">0:00</span>
-          <span id="total-time">0:00</span>
-        </div>
-      </div>
-    `;
-    
-    document.body.appendChild(playerContainer);
-  }
-
-  // Setup event listeners for all UI elements
+  // Setup event listeners for existing HTML elements
   setupEventListeners() {
     // Search functionality
-    document.getElementById('search-btn').addEventListener('click', () => this.performSearch());
-    document.getElementById('search-input').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') this.performSearch();
-    });
-
-    // Player controls
-    document.getElementById('play-pause-btn').addEventListener('click', () => this.togglePlayPause());
-    document.getElementById('prev-btn').addEventListener('click', () => this.previousTrack());
-    document.getElementById('next-btn').addEventListener('click', () => this.nextTrack());
-    document.getElementById('shuffle-btn').addEventListener('click', () => this.toggleShuffle());
-    document.getElementById('repeat-btn').addEventListener('click', () => this.toggleRepeat());
-
-    // Volume and progress controls
-    document.getElementById('volume-slider').addEventListener('input', (e) => this.setVolume(e.target.value));
-    document.getElementById('progress-slider').addEventListener('input', (e) => this.seekTo(e.target.value));
-
-    // Minimize button
-    document.getElementById('minimize-btn').addEventListener('click', () => this.toggleMinimize());
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+      searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          this.performSearch('track'); // Default to track search
+        }
+      });
+    }
 
     // Hardware key bindings
     document.addEventListener('keydown', (e) => this.handleKeyboardShortcuts(e));
@@ -129,9 +104,12 @@ class SpotifyMiniPlayer {
     }
   }
 
-  // Perform search for playlists and albums
-  async performSearch() {
-    const query = document.getElementById('search-input').value.trim();
+  // Perform search for tracks, albums, or playlists
+  async performSearch(searchType = 'track') {
+    const searchInput = document.getElementById('searchInput');
+    if (!searchInput) return;
+    
+    const query = searchInput.value.trim();
     if (!query) return;
 
     try {
@@ -139,12 +117,14 @@ class SpotifyMiniPlayer {
       this.sendPluginMessage({
         type: 'search_request',
         query: query,
-        searchTypes: ['playlist', 'album']
+        searchTypes: [searchType]
       });
       
       // Show loading state
-      const resultsContainer = document.getElementById('search-results');
-      resultsContainer.innerHTML = '<li class="loading">Searching...</li>';
+      const resultsContainer = document.getElementById('resultsList');
+      if (resultsContainer) {
+        resultsContainer.innerHTML = '<li class="result-item"><div class="result-title">Suche läuft...</div></li>';
+      }
     } catch (error) {
       console.error('Search error:', error);
       this.showError('Search failed. Please try again.');
@@ -153,35 +133,34 @@ class SpotifyMiniPlayer {
 
   // Display search results in the UI
   displaySearchResults(results) {
-    const resultsContainer = document.getElementById('search-results');
+    const resultsContainer = document.getElementById('resultsList');
+    if (!resultsContainer) return;
+    
     resultsContainer.innerHTML = '';
-
+    
     if (!results || results.length === 0) {
-      resultsContainer.innerHTML = '<li class="no-results">No results found</li>';
+      resultsContainer.innerHTML = '<li class="result-item"><div class="result-title">Keine Ergebnisse gefunden</div></li>';
       return;
     }
 
     results.forEach(item => {
       const listItem = document.createElement('li');
-      listItem.className = `result-item ${item.type}`;
+      listItem.className = `result-item ${item.type || ''}`;
       listItem.innerHTML = `
-        <div class="item-info">
-          <div class="item-title">${item.name}</div>
-          <div class="item-details">${item.type === 'playlist' ? item.owner : item.artist} • ${item.trackCount} tracks</div>
-        </div>
-        <button class="play-btn" data-uri="${item.uri}" data-type="${item.type}">▶</button>
+        <div class="result-title">${item.name || 'Unbekannt'}</div>
+        <div class="result-subtitle">${item.artist || item.owner || 'Unbekannter Künstler'}</div>
       `;
       
-      // Add click listener for play button
-      listItem.querySelector('.play-btn').addEventListener('click', (e) => {
-        this.playItem(e.target.dataset.uri, e.target.dataset.type);
+      // Add click listener to play the item
+      listItem.addEventListener('click', () => {
+        this.playItem(item.uri, item.type);
       });
       
       resultsContainer.appendChild(listItem);
     });
   }
 
-  // Play a playlist or album
+  // Play a track, playlist or album
   playItem(uri, type) {
     this.sendPluginMessage({
       type: 'play_request',
@@ -230,30 +209,80 @@ class SpotifyMiniPlayer {
   // UI update methods
   updateTrackInfo(track) {
     this.currentTrack = track;
-    document.getElementById('track-title').textContent = track.name || 'Unknown Track';
-    document.getElementById('track-artist').textContent = track.artist || 'Unknown Artist';
+    
+    // Update track title and artist
+    const titleElement = document.getElementById('currentTitle');
+    const artistElement = document.getElementById('currentArtist');
+    
+    if (titleElement) {
+      titleElement.textContent = track.name || 'Unbekannter Titel';
+    }
+    if (artistElement) {
+      artistElement.textContent = track.artist || 'Unbekannter Künstler';
+    }
+
+    // Update album cover
+    this.updateAlbumCover(track.albumArt || track.coverUrl || track.imageUrl);
+  }
+
+  // Update album cover image
+  updateAlbumCover(imageUrl) {
+    const coverImg = document.getElementById('albumCoverImg');
+    const placeholder = document.querySelector('.cover-placeholder');
+    
+    if (!coverImg || !placeholder) return;
+
+    if (imageUrl && imageUrl !== '') {
+      // Show the image and hide placeholder
+      coverImg.src = imageUrl;
+      coverImg.style.display = 'block';
+      placeholder.style.display = 'none';
+      
+      // Handle image load error - fall back to placeholder
+      coverImg.onerror = () => {
+        coverImg.style.display = 'none';
+        placeholder.style.display = 'flex';
+      };
+    } else {
+      // Hide image and show placeholder
+      coverImg.style.display = 'none';
+      placeholder.style.display = 'flex';
+    }
   }
 
   updatePlaybackState(isPlaying, position, duration) {
     this.isPlaying = isPlaying;
     
     // Update play/pause button
-    const playPauseBtn = document.getElementById('play-pause-btn');
-    playPauseBtn.textContent = isPlaying ? '⏸' : '▶';
+    const playBtn = document.getElementById('playBtn');
+    if (playBtn) {
+      playBtn.innerHTML = isPlaying ? '⏸️' : '▶️';
+    }
     
-    // Update progress
+    // Update progress and time display if elements exist
     if (duration > 0) {
       const progressSlider = document.getElementById('progress-slider');
-      progressSlider.value = (position / duration) * 100;
+      if (progressSlider) {
+        progressSlider.value = (position / duration) * 100;
+      }
       
-      // Update time display
-      document.getElementById('current-time').textContent = this.formatTime(position);
-      document.getElementById('total-time').textContent = this.formatTime(duration);
+      const currentTimeDisplay = document.getElementById('current-time');
+      const totalTimeDisplay = document.getElementById('total-time');
+      
+      if (currentTimeDisplay) {
+        currentTimeDisplay.textContent = this.formatTime(position);
+      }
+      if (totalTimeDisplay) {
+        totalTimeDisplay.textContent = this.formatTime(duration);
+      }
     }
   }
 
   updateVolumeDisplay(volume) {
-    document.getElementById('volume-slider').value = volume;
+    const volumeSlider = document.getElementById('volume-slider');
+    if (volumeSlider) {
+      volumeSlider.value = volume;
+    }
   }
 
   onPlaylistLoaded(playlist) {
@@ -297,6 +326,8 @@ class SpotifyMiniPlayer {
 
   adjustVolume(delta) {
     const volumeSlider = document.getElementById('volume-slider');
+    if (!volumeSlider) return;
+    
     const currentVolume = parseInt(volumeSlider.value);
     const newVolume = Math.max(0, Math.min(100, currentVolume + delta));
     volumeSlider.value = newVolume;
@@ -310,14 +341,32 @@ class SpotifyMiniPlayer {
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   }
 
-  toggleMinimize() {
-    const player = document.getElementById('spotify-miniplayer');
-    player.classList.toggle('minimized');
+  showError(message) {
+    const resultsContainer = document.getElementById('resultsList');
+    if (resultsContainer) {
+      resultsContainer.innerHTML = `<li class="result-item error"><div class="result-title">${message}</div></li>`;
+    }
+    
+    // Also show in status if available
+    const statusElement = document.getElementById('status');
+    if (statusElement) {
+      statusElement.textContent = message;
+      statusElement.classList.add('show');
+      setTimeout(() => {
+        statusElement.classList.remove('show');
+      }, 3000);
+    }
   }
 
-  showError(message) {
-    const resultsContainer = document.getElementById('search-results');
-    resultsContainer.innerHTML = `<li class="error">${message}</li>`;
+  showStatus(message) {
+    const statusElement = document.getElementById('status');
+    if (statusElement) {
+      statusElement.textContent = message;
+      statusElement.classList.add('show');
+      setTimeout(() => {
+        statusElement.classList.remove('show');
+      }, 2000);
+    }
   }
 
   // Send message to plugin system
