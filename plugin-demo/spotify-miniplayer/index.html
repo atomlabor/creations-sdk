@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -223,40 +223,40 @@
             <h1>🎵 Spotify Mini</h1>
         </div>
         <div class="search-section">
-            <input class="search-input" id="searchInput" type="text" placeholder="Suche nach Musik..." maxlength="50">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search for music..." maxlength="50">
             <div class="search-buttons">
-                <button class="search-btn" onclick="searchTracks()">Titel</button>
-                <button class="search-btn" onclick="searchAlbums()">Alben</button>
+                <button class="search-btn" onclick="searchTracks()">Tracks</button>
+                <button class="search-btn" onclick="searchAlbums()">Albums</button>
                 <button class="search-btn" onclick="searchPlaylists()">Playlists</button>
             </div>
         </div>
         <div class="current-track">
             <div id="cover-art">
-                <img id="albumCoverImg" src="" alt="Album Cover" style="display: none;">
+                <img id="albumCoverImg" alt="Album Cover" style="display: none;">
                 <div class="cover-placeholder">🎵</div>
             </div>
             <div class="track-info">
-                <div class="track-title" id="currentTitle">Kein Titel ausgewählt</div>
-                <div class="track-artist" id="currentArtist">Bereit zum Abspielen</div>
+                <div class="track-title" id="currentTitle">No track selected</div>
+                <div class="track-artist" id="currentArtist">Ready to play</div>
             </div>
         </div>
         <div class="controls">
-            <button class="control-btn" onclick="previousTrack()" title="Vorheriger Titel">
+            <button class="control-btn" onclick="previousTrack()" title="Previous track">
                 ⏮️
             </button>
-            <button class="control-btn play-btn" id="playBtn" onclick="togglePlayPause()" title="Abspielen/Pausieren">
+            <button class="control-btn play-btn" id="playBtn" onclick="togglePlayPause()" title="Play/Pause">
                 ▶️
             </button>
-            <button class="control-btn" onclick="nextTrack()" title="Nächster Titel">
+            <button class="control-btn" onclick="nextTrack()" title="Next track">
                 ⏭️
             </button>
         </div>
         <div class="results-section">
-            <div class="results-header" id="resultsHeader">Suchergebnisse</div>
+            <div class="results-header" id="resultsHeader">Search Results</div>
             <ul class="results-list" id="resultsList">
                 <li class="result-item">
-                    <div class="result-title">Willkommen!</div>
-                    <div class="result-subtitle">Suche nach deiner Lieblingsmusik</div>
+                    <div class="result-title">Welcome!</div>
+                    <div class="result-subtitle">Search for your favorite music</div>
                 </li>
             </ul>
         </div>
