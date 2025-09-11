@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify R1</title>
+    <title>Spotify R1 Miniplayer</title>
     <style>
         * {
             margin: 0;
@@ -12,14 +12,15 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #FF00A9, #1a1a1a);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1DB954, #191414);
             color: white;
             width: 240px;
             height: 282px;
             overflow: hidden;
             position: relative;
             border-radius: 16px;
+            user-select: none;
         }
         
         .container {
@@ -28,7 +29,7 @@
             display: flex;
             flex-direction: column;
             border-radius: 16px;
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.2);
             backdrop-filter: blur(10px);
         }
         
@@ -38,10 +39,11 @@
         }
         
         .header h1 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 4px;
-            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 2px;
+            color: #1DB954;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
         
         .auth-section {
@@ -50,7 +52,7 @@
         }
         
         .auth-status {
-            font-size: 11px;
+            font-size: 10px;
             margin-bottom: 4px;
             color: rgba(255, 255, 255, 0.8);
         }
@@ -58,96 +60,58 @@
         .spotify-login-btn {
             width: 100%;
             padding: 8px;
-            background: #FF00A9;
+            background: #1DB954;
             border: none;
-            border-radius: 8px;
+            border-radius: 20px;
             color: white;
             font-size: 11px;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-            display: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(29, 185, 84, 0.3);
         }
         
         .spotify-login-btn:hover {
-            background: #FF33B8;
+            background: #1ed760;
             transform: translateY(-1px);
-        }
-        
-        .search-section {
-            margin-bottom: 8px;
-        }
-        
-        .search-input {
-            width: 100%;
-            padding: 8px;
-            border: none;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            font-size: 12px;
-            outline: none;
-            transition: all 0.2s;
-        }
-        
-        .search-input:focus {
-            background: rgba(255, 255, 255, 0.25);
-        }
-        
-        .search-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-        
-        .search-buttons {
-            display: flex;
-            gap: 4px;
-            margin-top: 6px;
-        }
-        
-        .search-btn {
-            flex: 1;
-            padding: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            border-radius: 6px;
-            color: white;
-            font-size: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .search-btn:hover {
-            background: #FF00A9;
-            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(29, 185, 84, 0.4);
         }
         
         .current-track {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
             padding: 8px;
             margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 8px;
             backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        #cover-art {
-            width: 42px;
-            height: 42px;
-            border-radius: 6px;
-            background: rgba(255, 255, 255, 0.1);
+        .cover-art {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #1DB954, #1ed760);
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            overflow: hidden;
         }
         
-        #cover-art img {
+        .cover-art img {
             width: 100%;
             height: 100%;
-            border-radius: 6px;
             object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .cover-placeholder {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
         }
         
         .track-info {
@@ -158,11 +122,12 @@
         }
         
         .track-title {
-            font-weight: bold;
+            font-weight: 600;
             margin-bottom: 2px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            color: #fff;
         }
         
         .track-artist {
@@ -170,91 +135,105 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            color: #b3b3b3;
         }
         
         .controls {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 8px;
+            gap: 8px;
         }
         
-        .main-control-btn {
-            width: 60px;
-            height: 60px;
+        .control-btn {
+            width: 36px;
+            height: 36px;
             border: none;
             border-radius: 50%;
-            background: #FF00A9;
+            background: rgba(255, 255, 255, 0.1);
             color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
-            transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(255, 0, 169, 0.3);
-        }
-        
-        .main-control-btn:hover {
-            background: #FF33B8;
-            transform: scale(1.05);
-            box-shadow: 0 6px 16px rgba(255, 0, 169, 0.4);
-        }
-        
-        .wheel-hint {
-            text-align: center;
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 8px;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 4px 8px;
-            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.2s ease;
             backdrop-filter: blur(5px);
         }
         
-        .results-section {
-            flex: 1;
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .play-pause-btn {
+            width: 48px;
+            height: 48px;
+            background: #1DB954;
+            font-size: 20px;
+            box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+        }
+        
+        .play-pause-btn:hover {
+            background: #1ed760;
+            box-shadow: 0 6px 16px rgba(29, 185, 84, 0.4);
+        }
+        
+        .progress-section {
+            margin-bottom: 8px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .results-header {
-            font-size: 10px;
-            margin-bottom: 4px;
-            color: rgba(255, 255, 255, 0.8);
-        }
-        
-        .results-list {
-            flex: 1;
-            overflow-y: auto;
-            list-style: none;
-        }
-        
-        .result-item {
-            background: rgba(255, 255, 255, 0.1);
-            margin-bottom: 2px;
-            padding: 6px;
-            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.2s;
-            font-size: 10px;
-            line-height: 1.2;
         }
         
-        .result-item:hover {
-            background: #FF00A9;
-            transform: translateX(2px);
+        .progress-fill {
+            height: 100%;
+            background: #1DB954;
+            width: 0%;
+            transition: width 0.1s linear;
         }
         
-        .result-title {
-            font-weight: bold;
-            margin-bottom: 1px;
-        }
-        
-        .result-subtitle {
-            opacity: 0.7;
+        .time-display {
+            display: flex;
+            justify-content: space-between;
             font-size: 9px;
+            color: #b3b3b3;
+            margin-top: 2px;
+        }
+        
+        .volume-section {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+        
+        .volume-icon {
+            font-size: 12px;
+            color: #b3b3b3;
+        }
+        
+        .volume-bar {
+            flex: 1;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .volume-fill {
+            height: 100%;
+            background: #1DB954;
+            width: 50%;
+            border-radius: 2px;
         }
         
         .status {
@@ -262,93 +241,86 @@
             bottom: 4px;
             right: 4px;
             font-size: 8px;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
             padding: 2px 4px;
             border-radius: 4px;
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: opacity 0.3s ease;
+            color: #1DB954;
         }
         
         .status.show {
             opacity: 1;
         }
         
-        .cover-placeholder {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 16px;
+        .hidden {
+            display: none !important;
         }
         
-        .results-list::-webkit-scrollbar {
-            width: 4px;
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
         }
         
-        .results-list::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-        }
-        
-        .results-list::-webkit-scrollbar-thumb {
-            background: #FF00A9;
-            border-radius: 2px;
-        }
-        
-        .results-list::-webkit-scrollbar-thumb:hover {
-            background: #FF33B8;
+        .device-name {
+            font-size: 8px;
+            color: #b3b3b3;
+            text-align: center;
+            margin-bottom: 4px;
+            opacity: 0.7;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Spotify R1</h1>
+            <h1>♪ Spotify R1</h1>
         </div>
         
         <div class="auth-section">
-            <div class="auth-status" id="authStatus">Checking authentication...</div>
-            <button class="spotify-login-btn" id="spotifyLoginBtn" onclick="requestSpotifyAuth()">Sign in with Spotify Premium</button>
-        </div>
-        
-        <div class="search-section">
-            <input class="search-input" id="searchInput" type="text" placeholder="Search for music..." maxlength="50">
-            <div class="search-buttons">
-                <button class="search-btn" onclick="searchTracks()">Tracks</button>
-                <button class="search-btn" onclick="searchAlbums()">Albums</button>
-                <button class="search-btn" onclick="searchPlaylists()">Playlists</button>
-            </div>
+            <div class="auth-status" id="authStatus">Disconnected</div>
+            <button class="spotify-login-btn" id="loginBtn">Connect to Spotify</button>
         </div>
         
         <div class="current-track">
-            <div id="cover-art">
-                <img id="albumCoverImg" alt="Album Cover" style="display: none;">
+            <div class="cover-art" id="coverArt">
                 <div class="cover-placeholder">♪</div>
             </div>
             <div class="track-info">
-                <div class="track-title" id="currentTitle">No track selected</div>
-                <div class="track-artist" id="currentArtist">Ready to play</div>
+                <div class="track-title" id="trackTitle">No track playing</div>
+                <div class="track-artist" id="trackArtist">Connect to start playback</div>
             </div>
         </div>
         
         <div class="controls">
-            <button class="main-control-btn" id="mainControlBtn" onclick="togglePlayPause()" title="Select">Select</button>
+            <button class="control-btn" id="prevBtn" title="Previous">⏮</button>
+            <button class="control-btn play-pause-btn" id="playPauseBtn" title="Play/Pause">▶</button>
+            <button class="control-btn" id="nextBtn" title="Next">⏭</button>
         </div>
         
-        <div class="wheel-hint">
-            Scroll wheel: up = next, down = previous track
+        <div class="progress-section">
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="time-display">
+                <span id="currentTime">0:00</span>
+                <span id="totalTime">0:00</span>
+            </div>
         </div>
         
-        <div class="results-section">
-            <div class="results-header" id="resultsHeader">Search Results</div>
-            <ul class="results-list" id="resultsList">
-                <li class="result-item">
-                    <div class="result-title">Welcome!</div>
-                    <div class="result-subtitle">Search for your favorite music</div>
-                </li>
-            </ul>
+        <div class="volume-section">
+            <span class="volume-icon">🔊</span>
+            <div class="volume-bar" id="volumeBar">
+                <div class="volume-fill" id="volumeFill"></div>
+            </div>
         </div>
+        
+        <div class="device-name" id="deviceName">Spotify R1 Player</div>
         
         <div class="status" id="status"></div>
     </div>
     
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
     <script src="miniplayer.js"></script>
 </body>
 </html>
