@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Miniplayer - Rabbit R1</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="miniplayer">
+        <div class="album-art">
+            <img id="albumImage" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjMzMzIi8+CjxwYXRoIGQ9Ik0zMiAyMEM0MC44MzY2IDIwIDQ4IDI3LjE2MzQgNDggMzZDNDggNDQuODM2NiA0MC44MzY2IDUyIDMyIDUyQzIzLjE2MzQgNTIgMTYgNDQuODM2NiAxNiAzNkMxNiAyNy4xNjM0IDIzLjE2MzQgMjAgMzIgMjBaIiBmaWxsPSIjMUVENzYwIi8+CjxwYXRoIGQ9Ik0yNyAzMEMyNyAyOS40NDc3IDI3LjQ0NzcgMjkgMjggMjlIMzZDMzYuNTUyMyAyOSAzNyAyOS40NDc3IDM3IDMwVjQyQzM3IDQyLjU1MjMgMzYuNTUyMyA0MyAzNiA0M0gyOEMyNy40NDc3IDQzIDI3IDQyLjU1MjMgMjcgNDJWMzBaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K" alt="Album Art">
+        </div>
+        <div class="track-info">
+            <div class="track-title" id="trackTitle">Select a song</div>
+            <div class="track-artist" id="trackArtist">Rabbit R1 Player</div>
+        </div>
+        <div class="controls">
+            <button class="control-btn" id="prevBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+                </svg>
+            </button>
+            <button class="control-btn play-pause" id="playBtn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path id="playIcon" d="M8 5v14l11-7z"/>
+                    <path id="pauseIcon" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" style="display: none;"/>
+                </svg>
+            </button>
+            <button class="control-btn" id="nextBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+                </svg>
+            </button>
+        </div>
+        <div class="progress-container">
+            <div class="time" id="currentTime">0:00</div>
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+                <input type="range" id="progressSlider" min="0" max="100" value="0">
+            </div>
+            <div class="time" id="totalTime">0:00</div>
+        </div>
+    </div>
+    <script src="miniplayer.js"></script>
+</body>
+</html>
