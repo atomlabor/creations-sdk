@@ -1,316 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify R1 Miniplayer</title>
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            width: 240px !important;
-            height: 282px !important;
-            overflow: hidden !important;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1DB954, #191414);
-            color: white;
-            position: relative;
-            border-radius: 16px;
-            user-select: none;
-        }
-        
-        .card {
-            width: 240px !important;
-            height: 282px !important;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            border-radius: 16px;
-            background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
-            overflow: hidden !important;
-            box-sizing: border-box;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 12px;
-        }
-        
-        .header h1 {
-            font-size: 14px;
-            font-weight: 600;
-            margin: 0;
-        }
-        
-        .auth-section {
-            margin-bottom: 12px;
-        }
-        
-        .auth-status {
-            font-size: 10px;
-            text-align: center;
-            margin-bottom: 8px;
-            opacity: 0.8;
-        }
-        
-        .spotify-tip {
-            font-size: 9px;
-            text-align: center;
-            margin-bottom: 8px;
-            opacity: 0.9;
-            background: rgba(29, 185, 84, 0.1);
-            padding: 6px 8px;
-            border-radius: 8px;
-            border: 1px solid rgba(29, 185, 84, 0.3);
-        }
-        
-        .spotify-tip a {
-            color: #1ed760;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        
-        .spotify-tip a:hover {
-            text-decoration: underline;
-        }
-        
-        .spotify-login-btn {
-            width: 100%;
-            padding: 12px 16px;
-            background: #1DB954;
-            border: none;
-            border-radius: 20px;
-            color: white;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 12px rgba(29, 185, 84, 0.4);
-            z-index: 100;
-            position: relative;
-        }
-        
-        .spotify-login-btn:hover {
-            background: #1ed760;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(29, 185, 84, 0.6);
-        }
-        
-        .spotify-login-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 8px rgba(29, 185, 84, 0.4);
-        }
-        
-        .spotify-login-btn:disabled {
-            background: #535353;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .current-track {
-            display: flex;
-            margin-bottom: 12px;
-            flex: 1;
-        }
-        
-        .cover-art {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
-            background: #282828;
-            margin-right: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        
-        .cover-art img {
-            width: 100%;
-            height: 100%;
-            border-radius: 8px;
-            object-fit: cover;
-        }
-        
-        .cover-placeholder {
-            font-size: 20px;
-            opacity: 0.5;
-        }
-        
-        .track-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            min-width: 0;
-        }
-        
-        .track-title {
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .track-artist {
-            font-size: 10px;
-            opacity: 0.7;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 12px;
-        }
-        
-        .control-btn {
-            width: 32px;
-            height: 32px;
-            border: none;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 14px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        
-        .control-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
-        }
-        
-        .control-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-        
-        .play-pause-btn {
-            width: 40px;
-            height: 40px;
-            background: #1DB954;
-            font-size: 16px;
-        }
-        
-        .play-pause-btn:hover {
-            background: #1ed760;
-        }
-        
-        .progress-section {
-            margin-bottom: 8px;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 2px;
-            cursor: pointer;
-            margin-bottom: 4px;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: white;
-            border-radius: 2px;
-            width: 0%;
-            transition: width 0.1s;
-        }
-        
-        .time-display {
-            display: flex;
-            justify-content: space-between;
-            font-size: 9px;
-            opacity: 0.7;
-        }
-        
-        .device-name {
-            font-size: 8px;
-            color: #b3b3b3;
-            text-align: center;
-            margin-bottom: 4px;
-            opacity: 0.7;
-        }
-        
-        /* Hide auth section when connected */
-        .auth-section.hidden {
-            display: none !important;
-        }
-        
-        /* Make the connect button more prominent when disconnected */
-        .auth-section.disconnected {
-            margin-bottom: 16px;
-        }
-        
-        .auth-section.disconnected .spotify-login-btn {
-            padding: 14px 18px;
-            font-size: 13px;
-            font-weight: 800;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Rabbit R1 Spotify Webplayer Card</title>
+  <meta name="viewport" content="width=240, height=282, user-scalable=no"/>
+  <style>
+    body, html {
+      width: 240px; height: 282px; margin: 0; padding: 0;
+      overflow: hidden; background: #191414; color: #fff; font-family: sans-serif;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    #goSpotifyBtn {
+      width: 200px; height: 50px; border-radius: 20px;
+      font-size: 1.1em; font-weight: bold;
+      background: #1db954; color: #191414;
+      border: none; margin: 0 0 10px 0; cursor: pointer;
+      transition: background 0.2s;
+    }
+    #goSpotifyBtn:hover { background: #1ed760; }
+    .hint { font-size:0.9em; padding:0 12px; text-align:center; margin-bottom: 8px;}
+    .hardware { font-size: 0.8em; color: #b3b3b3; margin-top: 4px; }
+  </style>
 </head>
 <body>
-    <div class="card">
-        <div class="header">
-            <h1>♪ Spotify R1</h1>
-        </div>
-        
-        <div class="auth-section disconnected" id="authSection">
-            <div class="auth-status" id="authStatus">Nicht verbunden</div>
-            <div class="spotify-tip">
-                💡 Tipp: Stelle sicher, dass du bei <a href="https://open.spotify.com/" target="_blank">https://open.spotify.com/</a> eingeloggt bist. Anschließend klappt der Login mit einem Klick im Dialog.
-            </div>
-            <button class="spotify-login-btn" id="loginBtn">Connect to Spotify</button>
-        </div>
-        
-        <div class="current-track">
-            <div class="cover-art" id="coverArt">
-                <img id="albumCoverImg" style="display: none;"/>
-                <div class="cover-placeholder">♪</div>
-            </div>
-            <div class="track-info">
-                <div class="track-title" id="currentTitle">Kein Track wird abgespielt</div>
-                <div class="track-artist" id="currentArtist">Mit Spotify verbinden</div>
-            </div>
-        </div>
-        
-        <div class="controls">
-            <button class="control-btn" disabled id="prevBtn" onclick="previousTrack()" title="Vorheriger Track">⏮</button>
-            <button class="control-btn play-pause-btn" disabled id="playBtn" onclick="togglePlayPause()" title="Play/Pause">▶️</button>
-            <button class="control-btn" disabled id="nextBtn" onclick="nextTrack()" title="Nächster Track">⏭</button>
-        </div>
-        
-        <div class="progress-section">
-            <div class="progress-bar" id="progressBar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-            <div class="time-display">
-                <span id="current-time">0:00</span>
-                <span id="total-time">0:00</span>
-            </div>
-        </div>
-        
-        <div class="device-name" id="deviceName">Spotify R1 Player</div>
-        
-        <div class="status" id="status"></div>
-    </div>
-    
-    <script src="https://sdk.scdn.co/spotify-player.js"></script>
-    <script src="miniplayer.js"></script>
+  <div class="hint">
+    <b>Spotify auf Rabbit R1 nutzen:</b><br>
+    Einfach anmelden – dann startet der offizielle Spotify-Webplayer, angepasst auf das Mini-Display. Volle Musik-Auswahl, Playlists & Suche direkt wie auf jedem Gerät!
+  </div>
+  <button id="goSpotifyBtn">Spotify Web Player öffnen</button>
+  <div class="hardware">
+    <b>Bedienung:</b><br>
+    <span>• <b>Rabbit Button:</b> Play/Pause<br>
+    • <b>Scrollrad:</b> Lautstärke ändern oder Tracks skippen (falls unterstützt)</span>
+  </div>
+  <script>
+    document.getElementById('goSpotifyBtn').onclick = function() {
+      window.location.href = 'https://open.spotify.com/';
+      // Alternativ, falls Rabbit/Firmware window.open unterstützt:
+      // window.open('https://open.spotify.com/','_blank','width=240,height=282');
+    };
+    // Tipp: Hardware-Mapping für Scrollrad/Button kann ggf. via JS-Event-Listener ergänzt werden
+    // Beispiel (je nach Rabbit-Webview-Unterstützung):
+    // window.addEventListener('keydown', function(e) {
+    //   if (e.key === ' ') { /* Play/Pause */ }
+    //   if (e.key === 'ArrowUp') { /* Vol + */ }
+    //   if (e.key === 'ArrowDown') { /* Vol - */ }
+    // });
+  </script>
 </body>
 </html>
