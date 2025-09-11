@@ -1,5 +1,6 @@
-// Spotify Miniplayer Plugin
+// Spotify Miniplayer Plugin - Rabbit R1 Native Version
 // Playlist/Album search, play commands, UI updates, and hardware integration
+// Uses only PluginMessageHandler.postMessage() and window.onPluginMessage
 
 // Global functions that can be called from HTML onclick attributes
 function searchTracks() {
@@ -66,11 +67,18 @@ class SpotifyMiniPlayer {
     document.addEventListener('keydown', (e) => this.handleKeyboardShortcuts(e));
   }
 
-  // Setup plugin messaging system for external communication
+  // Setup plugin messaging system for Rabbit R1 native communication
   setupPluginMessaging() {
     window.onPluginMessage = (message) => {
       try {
-        const data = JSON.parse(message);
+        let data;
+        if (typeof message === 'string') {
+          data = JSON.parse(message);
+        } else if (message.data) {
+          data = typeof message.data === 'string' ? JSON.parse(message.data) : message.data;
+        } else {
+          data = message;
+        }
         this.handlePluginMessage(data);
       } catch (error) {
         console.error('Error parsing plugin message:', error);
@@ -113,17 +121,17 @@ class SpotifyMiniPlayer {
     if (!query) return;
 
     try {
-      // Send search request via plugin messaging
-      this.sendPluginMessage({
+      // Send search request via Rabbit R1 native plugin messaging
+      PluginMessageHandler.postMessage(JSON.stringify({
         type: 'search_request',
         query: query,
         searchTypes: [searchType]
-      });
+      }));
       
       // Show loading state
       const resultsContainer = document.getElementById('resultsList');
       if (resultsContainer) {
-        resultsContainer.innerHTML = '<li class="result-item"><div class="result-title">Suche läuft...</div></li>';
+        resultsContainer.innerHTML = '<li class="result-item"><div class="result-title">Searching...</div></li>';
       }
     } catch (error) {
       console.error('Search error:', error);
@@ -139,7 +147,7 @@ class SpotifyMiniPlayer {
     resultsContainer.innerHTML = '';
     
     if (!results || results.length === 0) {
-      resultsContainer.innerHTML = '<li class="result-item"><div class="result-title">Keine Ergebnisse gefunden</div></li>';
+      resultsContainer.innerHTML = '<li class="result-item"><div class="result-title">No results found</div></li>';
       return;
     }
 
@@ -147,8 +155,8 @@ class SpotifyMiniPlayer {
       const listItem = document.createElement('li');
       listItem.className = `result-item ${item.type || ''}`;
       listItem.innerHTML = `
-        <div class="result-title">${item.name || 'Unbekannt'}</div>
-        <div class="result-subtitle">${item.artist || item.owner || 'Unbekannter Künstler'}</div>
+        <div class="result-title">${item.name || 'Unknown'}</div>
+        <div class="result-subtitle">${item.artist || item.owner || 'Unknown Artist'}</div>
       `;
       
       // Add click listener to play the item
@@ -162,48 +170,48 @@ class SpotifyMiniPlayer {
 
   // Play a track, playlist or album
   playItem(uri, type) {
-    this.sendPluginMessage({
+    PluginMessageHandler.postMessage(JSON.stringify({
       type: 'play_request',
       uri: uri,
       itemType: type
-    });
+    }));
   }
 
   // Player control methods
   togglePlayPause() {
-    this.sendPluginMessage({
+    PluginMessageHandler.postMessage(JSON.stringify({
       type: this.isPlaying ? 'pause' : 'play'
-    });
+    }));
   }
 
   previousTrack() {
-    this.sendPluginMessage({ type: 'previous' });
+    PluginMessageHandler.postMessage(JSON.stringify({ type: 'previous' }));
   }
 
   nextTrack() {
-    this.sendPluginMessage({ type: 'next' });
+    PluginMessageHandler.postMessage(JSON.stringify({ type: 'next' }));
   }
 
   toggleShuffle() {
-    this.sendPluginMessage({ type: 'toggle_shuffle' });
+    PluginMessageHandler.postMessage(JSON.stringify({ type: 'toggle_shuffle' }));
   }
 
   toggleRepeat() {
-    this.sendPluginMessage({ type: 'toggle_repeat' });
+    PluginMessageHandler.postMessage(JSON.stringify({ type: 'toggle_repeat' }));
   }
 
   setVolume(volume) {
-    this.sendPluginMessage({
+    PluginMessageHandler.postMessage(JSON.stringify({
       type: 'set_volume',
       volume: parseInt(volume)
-    });
+    }));
   }
 
   seekTo(position) {
-    this.sendPluginMessage({
+    PluginMessageHandler.postMessage(JSON.stringify({
       type: 'seek',
       position: parseInt(position)
-    });
+    }));
   }
 
   // UI update methods
@@ -215,10 +223,10 @@ class SpotifyMiniPlayer {
     const artistElement = document.getElementById('currentArtist');
     
     if (titleElement) {
-      titleElement.textContent = track.name || 'Unbekannter Titel';
+      titleElement.textContent = track.name || 'Unknown Title';
     }
     if (artistElement) {
-      artistElement.textContent = track.artist || 'Unbekannter Künstler';
+      artistElement.textContent = track.artist || 'Unknown Artist';
     }
 
     // Update album cover
@@ -288,11 +296,13 @@ class SpotifyMiniPlayer {
   onPlaylistLoaded(playlist) {
     this.currentPlaylist = playlist;
     console.log('Playlist loaded:', playlist.name);
+    this.showStatus(`Playlist loaded: ${playlist.name}`);
   }
 
   onAlbumLoaded(album) {
     this.currentAlbum = album;
     console.log('Album loaded:', album.name);
+    this.showStatus(`Album loaded: ${album.name}`);
   }
 
   // Hardware integration - keyboard shortcuts
@@ -369,11 +379,12 @@ class SpotifyMiniPlayer {
     }
   }
 
-  // Send message to plugin system
+  // Send message via Rabbit R1 native plugin system
   sendPluginMessage(data) {
-    if (window.parent && window.parent.postMessage) {
-      window.parent.postMessage(JSON.stringify(data), '*');
-    } else {
+    try {
+      PluginMessageHandler.postMessage(JSON.stringify(data));
+    } catch (error) {
+      console.error('Error sending plugin message:', error);
       console.log('Plugin message:', data);
     }
   }
