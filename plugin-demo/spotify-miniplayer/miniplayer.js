@@ -1,10 +1,8 @@
 // ==== SPOTIFY WEBLOGIN - Multiuser-PKCE für Rabbit R1 ====
 // CLIENT_ID und REDIRECT_URI sind App-IDs; jeder meldet sich mit seinem eigenen Spotify-Konto an!
-
 const SPOTIFY_CLIENT_ID = 'DEIN_CLIENT_ID';      // <- deine App-ID
-const SPOTIFY_REDIRECT_URI = 'DEIN_REDIRECT_URI';// <- URL deiner Card, wie eingetragen!
+const SPOTIFY_REDIRECT_URI = 'https://atomlabor.github.io/creations-sdk/plugin-demo/spotify-miniplayer/';// <- URL deiner Card, wie eingetragen!
 const SPOTIFY_SCOPES = "streaming user-read-email user-read-private user-modify-playback-state user-read-playback-state playlist-read-private";
-
 // --- PKCE Hilfsfunktionen ---
 function generateRandomString(length) {
   let text = '', chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -16,7 +14,6 @@ async function generateCodeChallenge(verifier) {
   const hash = await window.crypto.subtle.digest('SHA-256', data);
   return btoa(String.fromCharCode(...new Uint8Array(hash))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
-
 // --- UI Helpers ---
 function setStatus(msg) { document.getElementById('status').textContent = msg; }
 function showLoginBtn(msg="") {
@@ -24,7 +21,6 @@ function showLoginBtn(msg="") {
   setStatus(msg);
 }
 function hideLoginBtn() { document.getElementById('loginBtn').style.display = "none"; }
-
 // --- Login-Flow global verfügbar machen ---
 window.doLoginFlow = function() {
   const codeVerifier = generateRandomString(128);
@@ -40,7 +36,6 @@ window.doLoginFlow = function() {
     window.location = authUrl;
   });
 };
-
 // --- Redirect-Callback: Auth-Code gegen Token tauschen und speichern ---
 function handleRedirectCallback() {
   if (window.location.search.includes('code=')) {
@@ -71,7 +66,6 @@ function handleRedirectCallback() {
   }
   return false;
 }
-
 // --- Playback-Device aktivieren und Player initialisieren ---
 function transferPlaybackHere(device_id, token) {
   fetch('https://api.spotify.com/v1/me/player', {
@@ -94,24 +88,21 @@ function initSpotifyPlayer() {
       document.getElementById('playPauseBtn').style.display = "";
     });
     player.addListener('not_ready', () => setStatus("Player not ready."));
-    // Bind Play/Pause und Hardwareevents wie gehabt...
+    // Bind Play/Pause und Hardwareevents wie gehabt..
     player.connect();
   };
 }
-
 // --- Globale Button-Logik und sicherer Binding nach DOM-Ready ---
 document.addEventListener('DOMContentLoaded', function(){
   var btn = document.getElementById('loginBtn');
   if(btn) btn.onclick = window.doLoginFlow;
 });
-
 // --- Aufruf beim Laden: Token prüfen oder Login anbieten ---
 if (!handleRedirectCallback()) {
   let token = localStorage.getItem('spotify_access_token');
   if (token) { hideLoginBtn(); initSpotifyPlayer(); }
   else showLoginBtn("Sign in with your own Premium account.");
 }
-
 /* 
  * CLIENT_ID und REDIRECT_URI sind KEINE geheimen Userdaten!
  * Jeder Nutzer gibt auf der Spotify Loginseite seinen eigenen Premium-Account ein.
