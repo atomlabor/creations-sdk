@@ -3,49 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify Miniplayer</title>
+    <title>spotify r1</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1db954, #191414);
+            background: linear-gradient(135deg, #FF00A9, #191414);
             color: white;
             width: 240px;
             height: 320px;
             overflow: hidden;
             position: relative;
         }
+        
         .container {
             padding: 8px;
             height: 100%;
             display: flex;
             flex-direction: column;
         }
+        
         .header {
             text-align: center;
             margin-bottom: 8px;
         }
+        
         .header h1 {
             font-size: 14px;
             margin-bottom: 4px;
         }
+        
         .auth-section {
             margin-bottom: 8px;
             text-align: center;
         }
+        
         .auth-status {
             font-size: 10px;
             margin-bottom: 4px;
             color: rgba(255, 255, 255, 0.8);
         }
+        
         .spotify-login-btn {
             width: 100%;
             padding: 8px;
-            background: #1db954;
+            background: #FF00A9;
             border: none;
             border-radius: 4px;
             color: white;
@@ -55,12 +62,15 @@
             transition: background 0.2s;
             display: none;
         }
+        
         .spotify-login-btn:hover {
-            background: #1ed760;
+            background: #FF33B8;
         }
+        
         .search-section {
             margin-bottom: 8px;
         }
+        
         .search-input {
             width: 100%;
             padding: 6px;
@@ -71,14 +81,17 @@
             font-size: 12px;
             outline: none;
         }
+        
         .search-input::placeholder {
             color: rgba(255, 255, 255, 0.6);
         }
+        
         .search-buttons {
             display: flex;
             gap: 4px;
             margin-top: 4px;
         }
+        
         .search-btn {
             flex: 1;
             padding: 4px;
@@ -90,9 +103,11 @@
             cursor: pointer;
             transition: background 0.2s;
         }
+        
         .search-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: #FF00A9;
         }
+        
         .current-track {
             background: rgba(0, 0, 0, 0.3);
             border-radius: 6px;
@@ -102,6 +117,7 @@
             align-items: center;
             gap: 8px;
         }
+        
         #cover-art {
             width: 48px;
             height: 48px;
@@ -112,18 +128,21 @@
             justify-content: center;
             flex-shrink: 0;
         }
+        
         #cover-art img {
             width: 100%;
             height: 100%;
             border-radius: 4px;
             object-fit: cover;
         }
+        
         .track-info {
             font-size: 11px;
             line-height: 1.2;
             flex: 1;
             min-width: 0;
         }
+        
         .track-title {
             font-weight: bold;
             margin-bottom: 2px;
@@ -131,18 +150,21 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+        
         .track-artist {
             opacity: 0.8;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
+        
         .controls {
             display: flex;
             justify-content: center;
             gap: 8px;
             margin-bottom: 8px;
         }
+        
         .control-btn {
             width: 32px;
             height: 32px;
@@ -157,34 +179,41 @@
             font-size: 14px;
             transition: all 0.2s;
         }
+        
         .control-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: #FF00A9;
             transform: scale(1.05);
         }
+        
         .play-btn {
-            background: #1db954;
+            background: #FF00A9;
             width: 40px;
             height: 40px;
         }
+        
         .play-btn:hover {
-            background: #1ed760;
+            background: #FF33B8;
         }
+        
         .results-section {
             flex: 1;
             overflow: hidden;
             display: flex;
             flex-direction: column;
         }
+        
         .results-header {
             font-size: 11px;
             margin-bottom: 4px;
             color: rgba(255, 255, 255, 0.8);
         }
+        
         .results-list {
             flex: 1;
             overflow-y: auto;
             list-style: none;
         }
+        
         .result-item {
             background: rgba(255, 255, 255, 0.1);
             margin-bottom: 2px;
@@ -195,17 +224,21 @@
             font-size: 10px;
             line-height: 1.2;
         }
+        
         .result-item:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: #FF00A9;
         }
+        
         .result-title {
             font-weight: bold;
             margin-bottom: 1px;
         }
+        
         .result-subtitle {
             opacity: 0.7;
             font-size: 9px;
         }
+        
         .status {
             position: absolute;
             bottom: 4px;
@@ -217,35 +250,39 @@
             opacity: 0;
             transition: opacity 0.3s;
         }
+        
         .status.show {
             opacity: 1;
         }
-        /* Cover art placeholder */
+        
         .cover-placeholder {
             color: rgba(255, 255, 255, 0.5);
             font-size: 16px;
         }
-        /* Scrollbar styling */
+        
         .results-list::-webkit-scrollbar {
             width: 4px;
         }
+        
         .results-list::-webkit-scrollbar-track {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 2px;
         }
+        
         .results-list::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
+            background: #FF00A9;
             border-radius: 2px;
         }
+        
         .results-list::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.5);
+            background: #FF33B8;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎵 Spotify Mini</h1>
+            <h1>spotify r1</h1>
         </div>
         
         <div class="auth-section">
@@ -265,7 +302,7 @@
         <div class="current-track">
             <div id="cover-art">
                 <img id="albumCoverImg" alt="Album Cover" style="display: none;">
-                <div class="cover-placeholder">🎵</div>
+                <div class="cover-placeholder">♪</div>
             </div>
             <div class="track-info">
                 <div class="track-title" id="currentTitle">No track selected</div>
@@ -275,13 +312,13 @@
         
         <div class="controls">
             <button class="control-btn" onclick="previousTrack()" title="Previous track">
-                ⏮️
+                ⏮
             </button>
             <button class="control-btn play-btn" id="playBtn" onclick="togglePlayPause()" title="Play/Pause">
-                ▶️
+                ▶
             </button>
             <button class="control-btn" onclick="nextTrack()" title="Next track">
-                ⏭️
+                ⏭
             </button>
         </div>
         
