@@ -399,3 +399,34 @@ document.addEventListener('DOMContentLoaded', () => {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = SpotifyMiniPlayer;
 }
+
+// --- Nach Login und Player-Initialisierung:
+function transferPlaybackHere(device_id, accessToken) {
+
+  fetch('https://api.spotify.com/v1/me/player', {
+    method: "PUT",
+    headers: {
+      'Authorization': 'Bearer ' + accessToken,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ device_ids: [device_id], play: false })
+  });
+}
+
+
+window.onSpotifyWebPlaybackSDKReady = () => {
+  player = new Spotify.Player({
+    name: "spotify r1 player",
+    getOAuthToken: cb => cb(localStorage.getItem("spotify_access_token"))
+    // ...weitere Optionen
+  });
+
+  player.addListener('ready', ({ device_id }) => {
+    deviceId = device_id;
+    setStatus("Ready to play!");
+    transferPlaybackHere(device_id, localStorage.getItem("spotify_access_token")); 
+    document.getElementById('playPauseBtn').style.display = "";
+  });
+
+  player.connect();
+}
