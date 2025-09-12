@@ -9,6 +9,7 @@ let spotifyPlayer = null;
 let currentDeviceId = null;
 let isPlaying = false;
 let currentTrack = null;
+let userInteractionDetected = false; // Track whether user has interacted
 
 // === PKCE HELPER FUNCTIONS ===
 function generateRandomString(length) {
@@ -168,7 +169,7 @@ function transferPlaybackHere(device_id, token) {
     },
     body: JSON.stringify({
       device_ids: [device_id],
-      play: false
+      play: false // Never autoplay - only play after user interaction
     })
   })
   .then(response => {
@@ -206,13 +207,18 @@ function initSpotifyPlayer() {
       volume: 0.8
     });
     
-    // Ready event
+    // Ready event with delay before device activation
     spotifyPlayer.addListener('ready', ({ device_id }) => {
       console.log('Ready with Device ID', device_id);
       currentDeviceId = device_id;
-      setStatus("Ready to play!");
-      transferPlaybackHere(device_id, token);
-      showPlayer();
+      setStatus("Player ready. Activating device...");
+      
+      // Rabbit R1 Workaround: Add delay before transferPlaybackHere
+      setTimeout(() => {
+        transferPlaybackHere(device_id, token);
+        showPlayer();
+        setStatus("Ready to play!");
+      }, 1200); // 1.2 second delay
     });
     
     // Not Ready event
@@ -265,10 +271,16 @@ function initSpotifyPlayer() {
 
 // === PLAYER CONTROLS ===
 window.togglePlayback = function() {
+  // Only allow play/pause if user has explicitly interacted with the button
+  if (!userInteractionDetected) {
+    console.log('Ignoring play/pause - no user interaction detected');
+    return;
+  }
+  
   if (!spotifyPlayer) return;
   
   spotifyPlayer.togglePlay().then(() => {
-    console.log('Toggled playback');
+    console.log('Toggled playback after user interaction');
   }).catch(error => {
     console.error('Error toggling playback:', error);
   });
@@ -300,9 +312,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const loginBtn = document.getElementById('loginBtn');
   if (loginBtn) loginBtn.onclick = window.doLoginFlow;
   
-  // Bind player controls
+  // Bind player controls with user interaction detection
   const playPauseBtn = document.getElementById('playPauseBtn');
-  if (playPauseBtn) playPauseBtn.onclick = window.togglePlayback;
+  if (playPauseBtn) {
+    playPauseBtn.onclick = function() {
+      userInteractionDetected = true; // Mark that user has interacted
+      window.togglePlayback();
+    };
+  }
   
   const nextBtn = document.getElementById('nextBtn');
   if (nextBtn) nextBtn.onclick = window.nextTrack;
@@ -335,4 +352,9 @@ window.addEventListener('beforeunload', function() {
  * - Jeder Nutzer gibt auf der Spotify Loginseite seinen eigenen Premium-Account ein.
  * - Zugriffstoken sind nur für die eigene Session/den eigenen Account gültig.
  * - PKCE flow ensures secure authorization without client secrets.
+ * 
+ * RABBIT R1 WORKAROUNDS:
+ * - Added 1200ms delay after player ready event before device activation
+ * - Play/Pause only triggers after explicit user button click (no autoplay)
+ * - userInteractionDetected flag prevents unwanted playback triggers
  */
