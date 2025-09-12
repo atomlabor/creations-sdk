@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Spotify Embed Wrapper - Rabbit R1</title>
+    <style>
+        /* Rabbit R1 Mini-Webview optimiert für 320x240px */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 320px;
+            height: 240px;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            color: #ffffff;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            height: 30px;
+            background: rgba(30, 215, 96, 0.1);
+            border-bottom: 2px solid #1ed760;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .spotify-container {
+            flex: 1;
+            position: relative;
+            border: 2px solid #1ed760;
+            margin: 5px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #121212;
+        }
+
+        .spotify-embed {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 6px;
+        }
+
+        .placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(45deg, #121212, #1a1a1a);
+        }
+
+        .placeholder h2 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #1ed760;
+        }
+
+        .placeholder p {
+            font-size: 10px;
+            line-height: 1.4;
+            margin-bottom: 8px;
+            opacity: 0.8;
+        }
+
+        .placeholder .spotify-logo {
+            font-size: 20px;
+            margin-bottom: 8px;
+            color: #1ed760;
+        }
+
+        .toggle-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(30, 215, 96, 0.2);
+            border: 1px solid #1ed760;
+            color: #1ed760;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle-btn:hover {
+            background: #1ed760;
+            color: #000;
+        }
+
+        /* Responsive für sehr kleine Bildschirme */
+        @media (max-width: 320px) {
+            body {
+                width: 100vw;
+                height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        🎵 Spotify Mini Player
+    </div>
+    
+    <div class="spotify-container">
+        <button class="toggle-btn" onclick="toggleEmbed()">DEMO</button>
+        
+        <!-- Platzhalter (standardmäßig sichtbar) -->
+        <div class="placeholder" id="placeholder">
+            <div class="spotify-logo">🎵</div>
+            <h2>Spotify Embed</h2>
+            <p>Hier kann ein Spotify-Embed oder der eigene Mini-Player eingebunden werden.</p>
+            <p><strong>Beispiel-URLs:</strong></p>
+            <p>• spotify-miniplayer/</p>
+            <p>• Spotify Embed-URL</p>
+        </div>
+        
+        <!-- Beispiel-iFrame (versteckt) -->
+        <iframe 
+            id="spotify-embed" 
+            class="spotify-embed" 
+            style="display: none;"
+            src="https://open.spotify.com/embed/playlist/37i9dQZF1DX0XUsuxWHRQd?utm_source=generator&theme=0"
+            frameborder="0" 
+            allowfullscreen="" 
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+            loading="lazy">
+        </iframe>
+    </div>
+
+    <script>
+        let showingEmbed = false;
+        
+        function toggleEmbed() {
+            const placeholder = document.getElementById('placeholder');
+            const embed = document.getElementById('spotify-embed');
+            const toggleBtn = document.querySelector('.toggle-btn');
+            
+            if (showingEmbed) {
+                // Zeige Platzhalter
+                placeholder.style.display = 'flex';
+                embed.style.display = 'none';
+                toggleBtn.textContent = 'DEMO';
+                showingEmbed = false;
+            } else {
+                // Zeige Embed
+                placeholder.style.display = 'none';
+                embed.style.display = 'block';
+                toggleBtn.textContent = 'INFO';
+                showingEmbed = true;
+            }
+        }
+        
+        // Optional: Automatisches Umschalten für Demo-Zwecke
+        // setInterval(toggleEmbed, 8000);
+    </script>
+</body>
+</html>
