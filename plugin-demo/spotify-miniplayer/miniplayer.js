@@ -9,14 +9,12 @@ const SPOTIFY_SCOPES = [
     'user-library-read',
     'streaming'
 ];
-
 // PKCE helper functions
 function generateCodeVerifier() {
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
     const randomValues = crypto.getRandomValues(new Uint8Array(64));
     return randomValues.reduce((acc, x) => acc + possible[x % possible.length], '');
 }
-
 async function generateCodeChallenge(codeVerifier) {
     const data = new TextEncoder().encode(codeVerifier);
     const digest = await crypto.subtle.digest('SHA-256', data);
@@ -25,7 +23,6 @@ async function generateCodeChallenge(codeVerifier) {
         .replace(/\//g, '_')
         .replace(/=+$/, '');
 }
-
 function getAccessToken() {
     // Check for existing token first
     const existingToken = window.localStorage.getItem('spotify_token');
@@ -42,7 +39,6 @@ function getAccessToken() {
     
     return null;
 }
-
 async function exchangeCodeForToken(code) {
     const codeVerifier = localStorage.getItem('code_verifier');
     
@@ -70,7 +66,6 @@ async function exchangeCodeForToken(code) {
         window.location.reload();
     }
 }
-
 async function loginWithSpotify() {
     const codeVerifier = generateCodeVerifier();
     const codeChallenge = await generateCodeChallenge(codeVerifier);
@@ -90,7 +85,6 @@ async function loginWithSpotify() {
     console.log('Spotify Login URL:', url);
     window.location.href = url;
 }
-
 // --- SPOTIFY MINIPLAYER-CLASS ---
 class SpotifyMiniplayerR1 {
     constructor(token) {
@@ -105,7 +99,6 @@ class SpotifyMiniplayerR1 {
             this.loadSpotifyData();
         }
     }
-
     init() {
         this.playBtn = document.getElementById('playBtn');
         this.prevBtn = document.getElementById('prevBtn');
@@ -117,29 +110,24 @@ class SpotifyMiniplayerR1 {
         this.r1Status = document.getElementById('r1Status');
         this.loginBtn = document.getElementById('loginSpotify');
         if(this.loginBtn) this.loginBtn.style.display = "none";
-
         this.playBtn.addEventListener('click', () => this.togglePlayback());
         this.prevBtn.addEventListener('click', () => this.previousTrack());
         this.nextBtn.addEventListener('click', () => this.nextTrack());
     }
-
     setupHardwareListeners() {
         // Rabbit R1 Hardware Events
         window.addEventListener("sideClick", () => {
             this.togglePlayback();
             this.showHardwareFeedback("⏯ Play/Pause");
         });
-
         window.addEventListener("scrollUp", () => {
             this.navigateUp();
             this.showHardwareFeedback("⬆ Hoch");
         });
-
         window.addEventListener("scrollDown", () => {
             this.navigateDown();
             this.showHardwareFeedback("⬇ Runter");
         });
-
         window.addEventListener("touchClick", (event) => {
             const focusedElement = document.querySelector('.album-item.focused');
             if (focusedElement) {
@@ -147,7 +135,6 @@ class SpotifyMiniplayerR1 {
             }
         });
     }
-
     async loadSpotifyData() {
         try {
             // 1. Kürzlich gespielt holen
@@ -161,7 +148,6 @@ class SpotifyMiniplayerR1 {
                 artwork: item.track.album.images[0]?.url
             }));
             this.renderAlbums();
-
             // 2. Aktueller Track
             await this.updateCurrentFromAPI();
         } catch(e) {
@@ -169,7 +155,6 @@ class SpotifyMiniplayerR1 {
             if(this.loginBtn) this.loginBtn.style.display = "block";
         }
     }
-
     async updateCurrentFromAPI() {
         try {
             const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
@@ -187,19 +172,16 @@ class SpotifyMiniplayerR1 {
             }
         } catch(e){ /* fallback */ }
     }
-
     navigateUp() {
         if (this.albums.length === 0) return;
         this.currentFocus = Math.max(this.currentFocus - 1, 0);
         this.updateFocus();
     }
-
     navigateDown() {
         if (this.albums.length === 0) return;
         this.currentFocus = Math.min(this.currentFocus + 1, this.albums.length - 1);
         this.updateFocus();
     }
-
     updateFocus() {
         document.querySelectorAll('.album-item').forEach(item => item.classList.remove('focused'));
         const currentItem = document.querySelector(`[data-index="${this.currentFocus}"]`);
@@ -208,7 +190,6 @@ class SpotifyMiniplayerR1 {
             currentItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     }
-
     selectAlbum(index) {
         if (index >= 0 && index < this.albums.length) {
             this.currentTrack = this.albums[index];
@@ -217,14 +198,12 @@ class SpotifyMiniplayerR1 {
             this.showHardwareFeedback(`♪ ${this.currentTrack.title}`);
         }
     }
-
     async playThisTrack(track) {
         // Suche Track URI heraus (idealerweise track.uri statt Name—hier auf /search ausbauen, wenn nötig)
         // Bei recently-played: eventuell via item.track.uri holen:
         //
         // Beispiel: await fetch('https://api.spotify.com/v1/me/player/play', ...) mit body {uris:[track.uri]}
     }
-
     async togglePlayback() {
         if(!this.token) return;
         this.isPlaying = !this.isPlaying;
@@ -238,7 +217,6 @@ class SpotifyMiniplayerR1 {
             "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.7)";
         this.updateCurrentFromAPI();
     }
-
     async previousTrack() {
         if(!this.token) return;
         await fetch('https://api.spotify.com/v1/me/player/previous', {
@@ -247,7 +225,6 @@ class SpotifyMiniplayerR1 {
         });
         setTimeout(()=>this.updateCurrentFromAPI(), 1000);
     }
-
     async nextTrack() {
         if(!this.token) return;
         await fetch('https://api.spotify.com/v1/me/player/next', {
@@ -256,7 +233,6 @@ class SpotifyMiniplayerR1 {
         });
         setTimeout(()=>this.updateCurrentFromAPI(), 1000);
     }
-
     updateCurrentTrack() {
         if (!this.currentTrack) return;
         this.trackTitle.textContent = this.currentTrack.title;
@@ -264,7 +240,6 @@ class SpotifyMiniplayerR1 {
         this.albumArt.src = this.currentTrack.artwork;
         this.albumArt.alt = `${this.currentTrack.title} Artwork`;
     }
-
     renderAlbums() {
         this.albumsGrid.innerHTML = '';
         this.albums.forEach((album, index) => {
@@ -272,8 +247,9 @@ class SpotifyMiniplayerR1 {
             albumItem.className = 'album-item';
             albumItem.dataset.index = index;
             albumItem.tabIndex = 0;
-albumItem.innerHTML = `
-    <img src="${album.artwork}" alt="${album.title}"/>
+            const cover = album.artwork && album.artwork.trim() ? album.artwork : 'BlankCoverArt.png';
+            albumItem.innerHTML = `
+    <img src="${cover}" alt="${album.title}"/>
     <div class="album-info">
         <div class="album-title">${album.title}</div>
         <div class="album-artist">${album.artist}</div>
@@ -290,7 +266,6 @@ albumItem.innerHTML = `
             this.updateFocus();
         }
     }
-
     showHardwareFeedback(message) {
         const existingFeedback = document.querySelector('.hardware-feedback');
         if (existingFeedback) { existingFeedback.remove(); }
@@ -305,7 +280,6 @@ albumItem.innerHTML = `
         }, 1500);
     }
 }
-
 // --- DOMContentLoaded: Auth/Start ---
 document.addEventListener('DOMContentLoaded', () => {
     const loginBtn = document.getElementById('loginSpotify');
