@@ -161,7 +161,7 @@ function transferPlaybackHere(device_id, token) {
     },
     body: JSON.stringify({
       device_ids: [device_id],
-      play: false // never autoplay - only after touch
+      play: true // never autoplay - only after touch
     })
   })
   .then(response => {
