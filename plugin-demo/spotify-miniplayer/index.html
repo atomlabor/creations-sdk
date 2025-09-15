@@ -7,17 +7,124 @@
   <style>
     html, body {
       width: 360px; /* Rabbit R1 display width */
-      height: 640px; /* Rabbit R1 display height */
-      margin: 0; padding: 0; box-sizing: border-box;
-      background: #181818; color: #fff;
+      height: 330px; /* Angepasst auf 330px */
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      background: #181818;
+      color: #fff;
       font-family: system-ui, sans-serif;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       overflow: hidden;
+    }
+    
+    #app {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: #181818;
+    }
+    
+    header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 0;
+      background: #282828;
+      border-radius: 8px 8px 0 0;
+    }
+    
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .tab-system {
+      display: flex;
+      background: #1e1e1e;
+      border-bottom: 1px solid #333;
+    }
+    
+    .tab-button {
+      flex: 1;
+      padding: 12px 8px;
+      background: none;
+      border: none;
+      color: #b3b3b3;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .tab-button.active {
+      color: #1ed760;
+      background: #282828;
+    }
+    
+    .tab-content {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      background: #181818;
+    }
+    
+    .chat-area {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .speak-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+    
+    .journal-area {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .data-area {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .hardware-area {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .button {
+      background: #1ed760;
+      color: #000;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .button:hover {
+      background: #1db954;
+      transform: scale(1.05);
     }
     
     #playerControls {
       width: 340px; /* Touch-optimized width with margins */
-      height: 600px; /* Touch-optimized height */
+      height: 280px; /* Angepasst an neue Gesamthöhe */
       box-sizing: border-box;
       background: #181818;
       border-radius: 12px;
@@ -31,202 +138,78 @@
     
     #loginSection {
       width: 340px;
-      height: 600px;
+      height: 280px; /* Angepasst an neue Gesamthöhe */
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      text-align: center;
+      padding: 20px;
       box-sizing: border-box;
     }
     
-    /* Album cover area */
-    .album-cover {
-      width: 280px;
-      height: 280px;
-      border-radius: 8px;
-      background: #333;
+    .spotify-logo {
+      width: 80px;
+      height: 80px;
       margin-bottom: 20px;
-      flex-shrink: 0;
-    }
-    
-    /* Song info area */
-    .song-info {
-      width: 100%;
-      text-align: center;
-      margin-bottom: 20px;
-      flex-shrink: 0;
-    }
-    
-    .song-title {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 8px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    
-    .song-artist {
-      font-size: 14px;
-      color: #b3b3b3;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    
-    /* Progress bar area */
-    .progress-section {
-      width: 100%;
-      margin-bottom: 24px;
-      flex-shrink: 0;
-    }
-    
-    .progress-bar {
-      width: 100%;
-      height: 6px;
-      background: #404040;
-      border-radius: 3px;
-      margin: 12px 0;
-      position: relative;
-      cursor: pointer;
-    }
-    
-    .progress-fill {
-      height: 100%;
-      background: #1db954;
-      border-radius: 3px;
-      width: 0%;
-      transition: width 0.1s linear;
-    }
-    
-    .time-display {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      color: #b3b3b3;
-    }
-    
-    /* Control buttons */
-    .controls {
+      background: #1ed760;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 24px;
-      width: 100%;
-      flex-shrink: 0;
+      font-size: 32px;
+      font-weight: bold;
+      color: #000;
     }
     
-    .control-btn {
-      background: none;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      padding: 12px;
-      border-radius: 50%;
-      transition: background-color 0.2s;
-      touch-action: manipulation;
-    }
-    
-    .control-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-    
-    .control-btn.small {
-      font-size: 24px;
-      width: 48px;
-      height: 48px;
-    }
-    
-    .control-btn.large {
-      font-size: 36px;
-      width: 64px;
-      height: 64px;
-      background: #1db954;
-    }
-    
-    .control-btn.large:hover {
+    .login-button {
       background: #1ed760;
-    }
-    
-    /* Login button */
-    .login-btn {
-      background: #1db954;
-      color: white;
+      color: #000;
       border: none;
-      padding: 16px 32px;
+      padding: 12px 24px;
       border-radius: 24px;
-      font-size: 16px;
       font-weight: bold;
       cursor: pointer;
-      transition: background-color 0.2s;
-      touch-action: manipulation;
+      font-size: 14px;
+      margin-top: 20px;
+      transition: all 0.2s;
     }
     
-    .login-btn:hover {
-      background: #1ed760;
+    .login-button:hover {
+      background: #1db954;
+      transform: scale(1.05);
     }
   </style>
 </head>
 <body>
-  <div id="loginSection">
-    <h1 style="text-align: center; margin-bottom: 32px; font-size: 24px;">Spotify Miniplayer</h1>
-    <p style="text-align: center; margin-bottom: 32px; color: #b3b3b3;">Für Rabbit R1 optimiert</p>
-    <button class="login-btn" onclick="loginWithSpotify()">Mit Spotify anmelden</button>
+  <div id="app">
+    <div id="loginSection">
+      <div class="spotify-logo">♪</div>
+      <h2>Spotify Miniplayer</h2>
+      <p>Verbinde dich mit Spotify</p>
+      <button class="login-button" onclick="connectToSpotify()">Mit Spotify verbinden</button>
+    </div>
+    
+    <div id="playerControls">
+      <div class="tab-system">
+        <button class="tab-button active">Player</button>
+        <button class="tab-button">Queue</button>
+        <button class="tab-button">Search</button>
+      </div>
+      
+      <div class="tab-content">
+        <div class="player-area">
+          <!-- Player content wird hier eingefügt -->
+        </div>
+      </div>
+    </div>
   </div>
   
-  <div id="playerControls">
-    <div class="album-cover" id="albumCover"></div>
-    
-    <div class="song-info">
-      <div class="song-title" id="songTitle">Song Title</div>
-      <div class="song-artist" id="songArtist">Artist Name</div>
-    </div>
-    
-    <div class="progress-section">
-      <div class="progress-bar" onclick="seekTo(event)">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
-      <div class="time-display">
-        <span id="currentTime">0:00</span>
-        <span id="totalTime">0:00</span>
-      </div>
-    </div>
-    
-    <div class="controls">
-      <button class="control-btn small" onclick="previousTrack()">⏮</button>
-      <button class="control-btn large" id="playPauseBtn" onclick="togglePlayPause()">▶</button>
-      <button class="control-btn small" onclick="nextTrack()">⏭</button>
-    </div>
-  </div>
-
   <script>
-    // Placeholder functions for Spotify integration
-    function loginWithSpotify() {
-      // Simulate login success
+    function connectToSpotify() {
+      // Spotify Authentication Logic
       document.getElementById('loginSection').style.display = 'none';
       document.getElementById('playerControls').style.display = 'flex';
-    }
-    
-    function togglePlayPause() {
-      const btn = document.getElementById('playPauseBtn');
-      btn.textContent = btn.textContent === '▶' ? '⏸' : '▶';
-    }
-    
-    function previousTrack() {
-      console.log('Previous track');
-    }
-    
-    function nextTrack() {
-      console.log('Next track');
-    }
-    
-    function seekTo(event) {
-      const progressBar = event.currentTarget;
-      const clickX = event.offsetX;
-      const width = progressBar.offsetWidth;
-      const percentage = (clickX / width) * 100;
-      document.getElementById('progressFill').style.width = percentage + '%';
     }
   </script>
 </body>
