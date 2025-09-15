@@ -9,7 +9,8 @@ const SPOTIFY_SCOPES = [
     'user-library-read',
     'streaming'
 ];
-// PKCE helper functions
+
+// --- PKCE helper functions ---
 function generateCodeVerifier() {
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
     const randomValues = crypto.getRandomValues(new Uint8Array(64));
@@ -27,21 +28,19 @@ function getAccessToken() {
     // Check for existing token first
     const existingToken = window.localStorage.getItem('spotify_token');
     if (existingToken) return existingToken;
-    
+
     // Check for authorization code in URL
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
-    
+
     if (code) {
         // Exchange code for token
         exchangeCodeForToken(code);
     }
-    
     return null;
 }
 async function exchangeCodeForToken(code) {
     const codeVerifier = localStorage.getItem('code_verifier');
-    
     const response = await fetch('https://accounts.spotify.com/api/token', {
         method: 'POST',
         headers: {
@@ -55,7 +54,7 @@ async function exchangeCodeForToken(code) {
             code_verifier: codeVerifier,
         }),
     });
-    
+
     const data = await response.json();
     if (data.access_token) {
         localStorage.setItem('spotify_token', data.access_token);
@@ -69,9 +68,7 @@ async function exchangeCodeForToken(code) {
 async function loginWithSpotify() {
     const codeVerifier = generateCodeVerifier();
     const codeChallenge = await generateCodeChallenge(codeVerifier);
-    
     localStorage.setItem('code_verifier', codeVerifier);
-    
     const params = new URLSearchParams({
         response_type: 'code',
         client_id: SPOTIFY_CLIENT_ID,
@@ -80,11 +77,10 @@ async function loginWithSpotify() {
         code_challenge_method: 'S256',
         code_challenge: codeChallenge,
     });
-    
     const url = `https://accounts.spotify.com/authorize?${params}`;
-    console.log('Spotify Login URL:', url);
     window.location.href = url;
 }
+
 // --- SPOTIFY MINIPLAYER-CLASS ---
 class SpotifyMiniplayerR1 {
     constructor(token) {
@@ -137,7 +133,7 @@ class SpotifyMiniplayerR1 {
     }
     async loadSpotifyData() {
         try {
-            // 1. Kürzlich gespielt holen
+            // Kürzlich gespielt holen inkl. Track-URIs!
             const response = await fetch('https://api.spotify.com/v1/me/player/recently-played?limit=7', {
                 headers: { 'Authorization': 'Bearer ' + this.token }
             });
@@ -145,10 +141,10 @@ class SpotifyMiniplayerR1 {
             this.albums = json.items.map(item => ({
                 title: item.track.name,
                 artist: item.track.artists.map(a => a.name).join(', '),
-                artwork: item.track.album.images[0]?.url
+                artwork: item.track.album.images[0]?.url,
+                uri: item.track.uri
             }));
             this.renderAlbums();
-            // 2. Aktueller Track
             await this.updateCurrentFromAPI();
         } catch(e) {
             this.showHardwareFeedback("⚠️ Login erforderlich!");
@@ -166,7 +162,8 @@ class SpotifyMiniplayerR1 {
                 this.currentTrack = {
                     title: data.item.name,
                     artist: data.item.artists.map(a => a.name).join(", "),
-                    artwork: data.item.album.images[0]?.url
+                    artwork: data.item.album.images[0]?.url,
+                    uri: data.item.uri
                 };
                 this.updateCurrentTrack();
             }
@@ -199,15 +196,19 @@ class SpotifyMiniplayerR1 {
         }
     }
     async playThisTrack(track) {
-        // Suche Track URI heraus (idealerweise track.uri statt Name—hier auf /search ausbauen, wenn nötig)
-        // Bei recently-played: eventuell via item.track.uri holen:
-        //
-        // Beispiel: await fetch('https://api.spotify.com/v1/me/player/play', ...) mit body {uris:[track.uri]}
+        const deviceId = window._rabbit_r1_device_id;
+        if (!deviceId || !track || !track.uri) return;
+        await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+            method: "PUT",
+            headers: { 'Authorization': 'Bearer ' + this.token, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ uris: [track.uri] })
+        });
     }
     async togglePlayback() {
-        if(!this.token) return;
+        const deviceId = window._rabbit_r1_device_id;
+        if(!this.token || !deviceId) return;
         this.isPlaying = !this.isPlaying;
-        const endpoint = `https://api.spotify.com/v1/me/player/${this.isPlaying ? "play" : "pause"}`;
+        const endpoint = `https://api.spotify.com/v1/me/player/${this.isPlaying ? "play" : "pause"}?device_id=${deviceId}`;
         await fetch(endpoint, {
             method: "PUT",
             headers: { 'Authorization': 'Bearer ' + this.token }
@@ -218,16 +219,18 @@ class SpotifyMiniplayerR1 {
         this.updateCurrentFromAPI();
     }
     async previousTrack() {
-        if(!this.token) return;
-        await fetch('https://api.spotify.com/v1/me/player/previous', {
+        const deviceId = window._rabbit_r1_device_id;
+        if(!this.token || !deviceId) return;
+        await fetch(`https://api.spotify.com/v1/me/player/previous?device_id=${deviceId}`, {
             method: "POST",
             headers: { 'Authorization': 'Bearer ' + this.token }
         });
         setTimeout(()=>this.updateCurrentFromAPI(), 1000);
     }
     async nextTrack() {
-        if(!this.token) return;
-        await fetch('https://api.spotify.com/v1/me/player/next', {
+        const deviceId = window._rabbit_r1_device_id;
+        if(!this.token || !deviceId) return;
+        await fetch(`https://api.spotify.com/v1/me/player/next?device_id=${deviceId}`, {
             method: "POST",
             headers: { 'Authorization': 'Bearer ' + this.token }
         });
@@ -235,9 +238,10 @@ class SpotifyMiniplayerR1 {
     }
     updateCurrentTrack() {
         if (!this.currentTrack) return;
+        const cover = this.currentTrack.artwork && this.currentTrack.artwork.trim() ? this.currentTrack.artwork : 'BlankCoverArt.png';
         this.trackTitle.textContent = this.currentTrack.title;
         this.trackArtist.textContent = this.currentTrack.artist;
-        this.albumArt.src = this.currentTrack.artwork;
+        this.albumArt.src = cover;
         this.albumArt.alt = `${this.currentTrack.title} Artwork`;
     }
     renderAlbums() {
@@ -249,12 +253,12 @@ class SpotifyMiniplayerR1 {
             albumItem.tabIndex = 0;
             const cover = album.artwork && album.artwork.trim() ? album.artwork : 'BlankCoverArt.png';
             albumItem.innerHTML = `
-    <img src="${cover}" alt="${album.title}"/>
-    <div class="album-info">
-        <div class="album-title">${album.title}</div>
-        <div class="album-artist">${album.artist}</div>
-    </div>
-`;
+                <img src="${cover}" alt="${album.title}"/>
+                <div class="album-info">
+                    <div class="album-title">${album.title}</div>
+                    <div class="album-artist">${album.artist}</div>
+                </div>
+            `;
             albumItem.addEventListener('click', () => {
                 this.currentFocus = index;
                 this.selectAlbum(index);
@@ -280,19 +284,8 @@ class SpotifyMiniplayerR1 {
         }, 1500);
     }
 }
-// --- DOMContentLoaded: Auth/Start ---
-document.addEventListener('DOMContentLoaded', () => {
-    const loginBtn = document.getElementById('loginSpotify');
-    if(loginBtn) loginBtn.onclick = loginWithSpotify;
-    const token = getAccessToken();
-    if(token){
-        new SpotifyMiniplayerR1(token);
-    } else if(loginBtn) {
-        loginBtn.style.display = "block";
-    }
-});
 
-
+// --- Web Playback SDK-Integration ---
 window.onSpotifyWebPlaybackSDKReady = () => {
     const token = getAccessToken();
     const player = new Spotify.Player({
@@ -300,32 +293,38 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         getOAuthToken: cb => { cb(token); },
         volume: 0.7
     });
-
-    // Ready-Event registrieren
     player.addListener('ready', ({ device_id }) => {
-        console.log('Rabbit R1 Miniplayer ist bereit mit Device ID', device_id);
-
-        // Playback bei Play-Befehlen explizit auf dieses Device lenken
         window._rabbit_r1_device_id = device_id;
+        console.log('Rabbit R1 Miniplayer ist bereit mit Device ID', device_id);
     });
-
     player.addListener('not_ready', ({ device_id }) => {
         console.log('Rabbit R1 Miniplayer nicht bereit', device_id);
     });
-
     player.connect();
 };
 
-
-
-async playThisTrack(track) {
-    const deviceId = window._rabbit_r1_device_id;
-    if (!deviceId || !track || !track.uri) return;
-
-    await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
-        method: "PUT",
-        headers: { 'Authorization': 'Bearer ' + this.token, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uris: [track.uri] })
-    });
-}
-
+// --- DOMContentLoaded: Auth/Start + Token-Validierung ---
+document.addEventListener('DOMContentLoaded', async () => {
+    const loginBtn = document.getElementById('loginSpotify');
+    if (loginBtn) loginBtn.onclick = loginWithSpotify;
+    let token = getAccessToken();
+    let valid = false;
+    if (token) {
+        // Token gegen Spotify-API prüfen
+        try {
+            const testResp = await fetch('https://api.spotify.com/v1/me', {
+                headers: { Authorization: 'Bearer ' + token }
+            });
+            valid = testResp.ok;
+        } catch(e){
+            valid = false;
+        }
+    }
+    if (token && valid) {
+        new SpotifyMiniplayerR1(token);
+    } else {
+        // Falls Token ungültig: logge aus und zeige Login-Button
+        window.localStorage.removeItem('spotify_token');
+        if (loginBtn) loginBtn.style.display = "block";
+    }
+});
