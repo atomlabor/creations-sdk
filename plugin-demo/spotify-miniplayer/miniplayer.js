@@ -1,4 +1,4 @@
-// --- Spotify Auth/Token-Utility ---
+// --- Spotify Auth/Token-Utility (Cleaned, Production-Ready) ---
 const SPOTIFY_CLIENT_ID = 'f28477d2f23444739d1f6911c1d6be9d';
 const SPOTIFY_REDIRECT_URI = 'https://atomlabor.github.io/rabbit-r1-apps/plugin-demo/spotify-miniplayer/';
 const SPOTIFY_SCOPES = [
@@ -105,6 +105,7 @@ class SpotifyMiniplayerR1 {
             this.loadSpotifyData();
         }
     }
+
     init() {
         this.playBtn = document.getElementById('playBtn');
         this.prevBtn = document.getElementById('prevBtn');
@@ -116,24 +117,29 @@ class SpotifyMiniplayerR1 {
         this.r1Status = document.getElementById('r1Status');
         this.loginBtn = document.getElementById('loginSpotify');
         if(this.loginBtn) this.loginBtn.style.display = "none";
+
         this.playBtn.addEventListener('click', () => this.togglePlayback());
         this.prevBtn.addEventListener('click', () => this.previousTrack());
         this.nextBtn.addEventListener('click', () => this.nextTrack());
     }
+
     setupHardwareListeners() {
         // Rabbit R1 Hardware Events
         window.addEventListener("sideClick", () => {
             this.togglePlayback();
             this.showHardwareFeedback("⏯ Play/Pause");
         });
+
         window.addEventListener("scrollUp", () => {
             this.navigateUp();
             this.showHardwareFeedback("⬆ Hoch");
         });
+
         window.addEventListener("scrollDown", () => {
             this.navigateDown();
             this.showHardwareFeedback("⬇ Runter");
         });
+
         window.addEventListener("touchClick", (event) => {
             const focusedElement = document.querySelector('.album-item.focused');
             if (focusedElement) {
@@ -141,6 +147,7 @@ class SpotifyMiniplayerR1 {
             }
         });
     }
+
     async loadSpotifyData() {
         try {
             // 1. Kürzlich gespielt holen
@@ -154,6 +161,7 @@ class SpotifyMiniplayerR1 {
                 artwork: item.track.album.images[0]?.url
             }));
             this.renderAlbums();
+
             // 2. Aktueller Track
             await this.updateCurrentFromAPI();
         } catch(e) {
@@ -161,6 +169,7 @@ class SpotifyMiniplayerR1 {
             if(this.loginBtn) this.loginBtn.style.display = "block";
         }
     }
+
     async updateCurrentFromAPI() {
         try {
             const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
@@ -178,16 +187,19 @@ class SpotifyMiniplayerR1 {
             }
         } catch(e){ /* fallback */ }
     }
+
     navigateUp() {
         if (this.albums.length === 0) return;
         this.currentFocus = Math.max(this.currentFocus - 1, 0);
         this.updateFocus();
     }
+
     navigateDown() {
         if (this.albums.length === 0) return;
         this.currentFocus = Math.min(this.currentFocus + 1, this.albums.length - 1);
         this.updateFocus();
     }
+
     updateFocus() {
         document.querySelectorAll('.album-item').forEach(item => item.classList.remove('focused'));
         const currentItem = document.querySelector(`[data-index="${this.currentFocus}"]`);
@@ -196,6 +208,7 @@ class SpotifyMiniplayerR1 {
             currentItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     }
+
     selectAlbum(index) {
         if (index >= 0 && index < this.albums.length) {
             this.currentTrack = this.albums[index];
@@ -204,12 +217,14 @@ class SpotifyMiniplayerR1 {
             this.showHardwareFeedback(`♪ ${this.currentTrack.title}`);
         }
     }
+
     async playThisTrack(track) {
         // Suche Track URI heraus (idealerweise track.uri statt Name—hier auf /search ausbauen, wenn nötig)
         // Bei recently-played: eventuell via item.track.uri holen:
         //
         // Beispiel: await fetch('https://api.spotify.com/v1/me/player/play', ...) mit body {uris:[track.uri]}
     }
+
     async togglePlayback() {
         if(!this.token) return;
         this.isPlaying = !this.isPlaying;
@@ -223,6 +238,7 @@ class SpotifyMiniplayerR1 {
             "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.7)";
         this.updateCurrentFromAPI();
     }
+
     async previousTrack() {
         if(!this.token) return;
         await fetch('https://api.spotify.com/v1/me/player/previous', {
@@ -231,6 +247,7 @@ class SpotifyMiniplayerR1 {
         });
         setTimeout(()=>this.updateCurrentFromAPI(), 1000);
     }
+
     async nextTrack() {
         if(!this.token) return;
         await fetch('https://api.spotify.com/v1/me/player/next', {
@@ -239,6 +256,7 @@ class SpotifyMiniplayerR1 {
         });
         setTimeout(()=>this.updateCurrentFromAPI(), 1000);
     }
+
     updateCurrentTrack() {
         if (!this.currentTrack) return;
         this.trackTitle.textContent = this.currentTrack.title;
@@ -246,6 +264,7 @@ class SpotifyMiniplayerR1 {
         this.albumArt.src = this.currentTrack.artwork;
         this.albumArt.alt = `${this.currentTrack.title} Artwork`;
     }
+
     renderAlbums() {
         this.albumsGrid.innerHTML = '';
         this.albums.forEach((album, index) => {
@@ -271,6 +290,7 @@ class SpotifyMiniplayerR1 {
             this.updateFocus();
         }
     }
+
     showHardwareFeedback(message) {
         const existingFeedback = document.querySelector('.hardware-feedback');
         if (existingFeedback) { existingFeedback.remove(); }
@@ -285,6 +305,7 @@ class SpotifyMiniplayerR1 {
         }, 1500);
     }
 }
+
 // --- DOMContentLoaded: Auth/Start ---
 document.addEventListener('DOMContentLoaded', () => {
     const loginBtn = document.getElementById('loginSpotify');
