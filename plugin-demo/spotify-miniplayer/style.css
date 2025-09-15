@@ -29,7 +29,6 @@ body {
     gap: 7px;
     justify-content: flex-start;
 }
-
 .current-track {
     background: linear-gradient(110deg, #23271d15 0%, #37c97d1e 100%);
     border-radius: 8px;
@@ -83,14 +82,13 @@ body {
 #deviceSelect option:disabled {
     opacity: .65; color: #acffcf;
 }
-
 .about-tiny {
-    font-size: 9.4px;
+    font-size: 9.3px;
     color: #d6fff2;
     opacity: 0.80;
     text-align: left;
-    padding-top: 3px;
-    line-height: 1.25;
+    padding-top: 4px;
+    line-height: 1.22;
     margin-left: 1px;
     margin-bottom: 0;
 }
@@ -105,7 +103,6 @@ body {
     border: none;
     border-radius: 17px;
     color: white;
-    font-size: 13px;
     width: 39px;
     height: 39px;
     display: flex;
@@ -113,6 +110,12 @@ body {
     justify-content: center;
     cursor: pointer;
     transition: background 0.18s, transform 0.13s;
+}
+.control-btn svg {
+    width: 22px;
+    height: 22px;
+    display: block;
+    pointer-events: none;
 }
 .control-btn.primary {
     background: #1db954;
@@ -146,7 +149,6 @@ body {
     min-height: 16px;
     text-align: center;
 }
-
 .hardware-feedback {
     position: absolute;
     top: 50%; left: 50%;
