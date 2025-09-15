@@ -291,3 +291,41 @@ document.addEventListener('DOMContentLoaded', () => {
         loginBtn.style.display = "block";
     }
 });
+
+
+window.onSpotifyWebPlaybackSDKReady = () => {
+    const token = getAccessToken();
+    const player = new Spotify.Player({
+        name: 'Rabbit R1 Miniplayer',
+        getOAuthToken: cb => { cb(token); },
+        volume: 0.7
+    });
+
+    // Ready-Event registrieren
+    player.addListener('ready', ({ device_id }) => {
+        console.log('Rabbit R1 Miniplayer ist bereit mit Device ID', device_id);
+
+        // Playback bei Play-Befehlen explizit auf dieses Device lenken
+        window._rabbit_r1_device_id = device_id;
+    });
+
+    player.addListener('not_ready', ({ device_id }) => {
+        console.log('Rabbit R1 Miniplayer nicht bereit', device_id);
+    });
+
+    player.connect();
+};
+
+
+
+async playThisTrack(track) {
+    const deviceId = window._rabbit_r1_device_id;
+    if (!deviceId || !track || !track.uri) return;
+
+    await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+        method: "PUT",
+        headers: { 'Authorization': 'Bearer ' + this.token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uris: [track.uri] })
+    });
+}
+
