@@ -1,110 +1,118 @@
 body {
     margin: 0;
     padding: 0;
-    background: #15151b;   /* jetzt tiefschwarz */
+    background: #11110f;
     min-height: 100vh;
     display: flex;
     justify-content: center;
+    align-items: flex-start;
 }
 .r1-app-container {
     width: 240px;
-    background: #111112;   /* innen nearly black für modernen Look */
-    border-radius: 12px;
-    margin: 18px auto 6px auto;
-    padding: 10px 8px 6px 8px;
+    height: 282px;
+    background: #181818;
+    border-radius: 13px;
+    margin: 8px auto 0 auto;
+    padding: 10px 8px 8px 8px;
     box-sizing: border-box;
     font-family: 'SF Pro Display', -apple-system, sans-serif;
     color: white;
-    overflow: hidden;
-    box-shadow: 0 4px 22px rgba(42,128,68,0.18);
-}
-.miniplayer-container {
-    height: 100%;
+    box-shadow: 0 4px 18px rgba(42,128,68,0.18);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    justify-content: space-between;
 }
-/* Track-/Header-Bereich mit grünem Akzent */
+.miniplayer-container {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    justify-content: flex-start;
+}
+
 .current-track {
-    background: linear-gradient(110deg, #23c85915 0%, #2dbe6180 100%);
+    background: linear-gradient(110deg, #23271d15 0%, #37c97d1e 100%);
     border-radius: 8px;
-    padding: 8px;
+    padding: 7px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    min-height: 62px;
+    gap: 7px;
 }
 .track-artwork img {
-    width: 48px;
-    height: 48px;
-    border-radius: 9px;
+    width: 42px;
+    height: 42px;
+    border-radius: 6px;
     object-fit: cover;
-    background: #212623;
-    border: 1.4px solid #19c3553d;
+    background: #242926;
+    border: 1.2px solid #19c35516;
 }
 .track-info {
-    flex: 1;
+    flex: 1 1 auto;
     overflow: hidden;
     min-width: 0;
 }
 .track-title {
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 2px;
-    letter-spacing: .06px;
+    margin-bottom: 0.5px;
 }
 .track-artist {
-    font-size: 10.2px;
-    color: #eaf8ea;
-    opacity: 0.92;
+    font-size: 10px;
+    color: #cee3ce;
+    opacity: 0.90;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 4px;
+    margin-bottom: 2.5px;
 }
-/* Device Dropdown */
 #deviceSelect {
-    border: 1.5px solid #23a94b7a;
-    background: rgba(255,255,255,0.03);
+    border: 1.2px solid #23a94b58;
+    background: rgba(30,40,30,0.21);
     color: #fff;
-    border-radius: 7px;
+    border-radius: 6px;
     width: 100%;
-    font-size: 11px;
-    padding: 4px 4px;
+    font-size: 10.5px;
+    padding: 3.5px 3px;
     outline: none;
-    margin-top: 5px;
+    margin-bottom: 0;
+    margin-top: 1.5px;
+}
+#deviceSelect option:disabled {
+    opacity: .65; color: #acffcf;
+}
+
+.about-tiny {
+    font-size: 9.4px;
+    color: #d6fff2;
+    opacity: 0.80;
+    text-align: left;
+    padding-top: 3px;
+    line-height: 1.25;
+    margin-left: 1px;
     margin-bottom: 0;
 }
-/* disabled Options grau darstellen */
-#deviceSelect option:disabled {
-    opacity: 0.55;
-    color: #8ae5b3;
-}
-/* Steuer-Buttons */
 .player-controls {
     display: flex;
     justify-content: center;
-    gap: 13px;
-    padding: 9px 0 2px 0;
+    gap: 10px;
+    padding: 10px 0 2px 0;
 }
 .control-btn {
-    background: rgba(52,255,104,0.14);
+    background: rgba(55,255,110,0.13);
     border: none;
-    border-radius: 22px;
+    border-radius: 17px;
     color: white;
-    font-size: 14.5px;
-    letter-spacing: .6px;
-    width: 41px;
-    height: 41px;
+    font-size: 13px;
+    width: 39px;
+    height: 39px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 1px 2.5px rgba(55,134,70,0.12);
-    transition: background 0.22s, transform 0.15s;
+    transition: background 0.18s, transform 0.13s;
 }
 .control-btn.primary {
     background: #1db954;
@@ -112,56 +120,54 @@ body {
     font-weight: 600;
 }
 .control-btn:active, .control-btn:focus {
-    background: #28bd64;
+    background: #25be635c;
     outline: none;
     transform: scale(1.07);
 }
 #loginSpotify {
-    margin-top: 12px;
-    display: none;
+    margin-top: 0;
     width: 100%;
-    border-radius: 8px;
-    font-size: 12.5px;
+    border-radius: 7px;
+    font-size: 11.8px;
     font-weight: bold;
     background: #1db954;
     color: #fff;
     border: none;
-    padding: 12px 0;
+    padding: 10px 0;
     cursor: pointer;
     box-shadow: 0 1px 4px #1271301a;
+    align-self: flex-end;
 }
 .r1-status {
-    background: rgba(0,0,0,0.23);
+    background: rgba(0,0,0,0.17);
     border-radius: 6px;
-    padding: 3px 5px;
-    margin-top: 2.5px;
-    font-size: 10.6px;
-    min-height: 19px;
+    padding: 2px 3px;
+    font-size: 9.6px;
+    min-height: 16px;
     text-align: center;
 }
+
 .hardware-feedback {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
     background: rgba(0,0,0,0.91);
-    color: white;
-    padding: 9px 15px;
-    border-radius: 9px;
-    font-size: 13px;
+    color: #baf2ce;
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 11px;
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity 0.18s;
     pointer-events: none;
-    z-index: 1500;
+    z-index: 200;
 }
 .hardware-feedback.show { opacity: 1; }
-.about-box {
-    background: rgba(0,0,0,0.51);
-    color: #e3fee6;
-    font-size: 12.5px;
-    padding: 13px 10px 14px 10px;
-    border-radius: 8px;
-    margin-bottom: 13px;
-    line-height: 1.4;
-    width: 100%;
+.hardware-legend {
+    font-size: 8.5px;
+    color: #b3fabd;
+    opacity: .68;
     text-align: center;
+    margin-top: 4.5px;
+    margin-bottom: 2.5px;
+    letter-spacing: 0.03em;
 }
