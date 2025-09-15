@@ -76,8 +76,10 @@ function updateTrackInfo(track) {
 function updatePlayButton() {
   const playBtn = document.getElementById('playPauseBtn');
   if (playBtn) {
-    playBtn.textContent = isPlaying ? '❚❚' : '►';
+    // Keine Emojis, sondern Unicode/SVG
     playBtn.title = isPlaying ? 'Pause' : 'Play';
+    // Play/Pause-Handling (falls SVG Toggle notwendig)
+    if (typeof updatePlayPauseIcon === 'function') updatePlayPauseIcon(isPlaying);
   }
 }
 
@@ -137,18 +139,21 @@ function handleRedirectCallback() {
         setupRabbitAlbumPlaylistUI();
         const playHint = document.getElementById('playHint');
         if (playHint) playHint.style.display = 'block';
-  } else {
-    console.error('Token exchange failed:', data);
-    setStatus("Authorization failed.");
-    showLoginBtn("Try again.");
-  }
-})
-.catch(error => {
-  console.error('Token exchange error:', error);
-  setStatus("Authorization error.");
-  showLoginBtn("Try again.");
-});
-
+      } else {
+        // Erweiterte Fehlerausgabe!
+        console.error('Token exchange failed:', data);
+        setStatus("Authorization failed: " + JSON.stringify(data));
+        localStorage.removeItem("spotify_access_token");
+        showLoginBtn("Try again.");
+      }
+    })
+    .catch(error => {
+      // Erweiterte Fehlerausgabe auch im Catch!
+      console.error('Token exchange error:', error);
+      setStatus("Authorization error: " + error);
+      localStorage.removeItem("spotify_access_token");
+      showLoginBtn("Try again.");
+    });
     return true;
   }
   return false;
@@ -164,7 +169,7 @@ function transferPlaybackHere(device_id, token) {
     },
     body: JSON.stringify({
       device_ids: [device_id],
-      play: false // KEIN Autoplay – zwingend!
+      play: false
     })
   });
 }
@@ -211,18 +216,18 @@ function initSpotifyPlayer() {
       setStatus(isPlaying ? "Playing" : "Paused");
     });
     spotifyPlayer.addListener('initialization_error', ({ message }) => {
-      setStatus("Player initialization failed.");
+      setStatus("Player initialization failed: " + message);
     });
     spotifyPlayer.addListener('authentication_error', ({ message }) => {
       localStorage.removeItem('spotify_access_token');
-      setStatus("Authentication failed.");
+      setStatus("Authentication failed: " + message);
       showLoginBtn("Sign in again.");
     });
     spotifyPlayer.addListener('account_error', ({ message }) => {
-      setStatus("Account validation failed. Premium required.");
+      setStatus("Account validation failed: " + message + " (Premium required)");
     });
     spotifyPlayer.addListener('playback_error', ({ message }) => {
-      setStatus("Playback error.");
+      setStatus("Playback error: " + message);
     });
     spotifyPlayer.connect();
   };
@@ -333,14 +338,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 });
-
 async function setupRabbitAlbumPlaylistUI() {
   await populatePlaylists();
   await populateAlbums();
   const playlistSelect = document.getElementById('playlistSelect');
   if (playlistSelect && playlistSelect.value) populateTrackList('playlist', playlistSelect.value);
 }
-
 window.addEventListener('beforeunload', function() {
   if (spotifyPlayer) {
     spotifyPlayer.disconnect();
