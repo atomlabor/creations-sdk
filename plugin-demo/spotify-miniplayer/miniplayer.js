@@ -3,7 +3,6 @@
 const SPOTIFY_CLIENT_ID = 'f28477d2f23444739d1f6911c1d6be9d';
 const SPOTIFY_REDIRECT_URI = 'https://atomlabor.github.io/rabbit-spotify-miniplayer/';
 const SPOTIFY_SCOPES = "streaming user-read-email user-read-private user-modify-playback-state user-read-playback-state playlist-read-private";
-
 let spotifyPlayer = null;
 let currentDeviceId = null;
 let isPlaying = false;
@@ -149,7 +148,6 @@ function handleRedirectCallback() {
       setStatus("Authorization error.");
       showLoginBtn("Try again.");
     });
-
     return true;
   }
   return false;
@@ -165,7 +163,7 @@ function transferPlaybackHere(device_id, token) {
     },
     body: JSON.stringify({
       device_ids: [device_id],
-      play: false // NIE autom. Autoplay! User-Tap nötig für Dauer-Playback.
+      play: false // KEIN Autoplay – zwingend!
     })
   });
 }
@@ -190,19 +188,16 @@ function initSpotifyPlayer() {
       volume: 0.8
     });
     spotifyPlayer.addListener('ready', ({ device_id }) => {
-      console.log('Ready with Device ID', device_id);
       currentDeviceId = device_id;
       setStatus("Player ready. Aktivieren...");
-
       setTimeout(() => {
         transferPlaybackHere(device_id, token);
         setStatus("Bereit zum Abspielen!");
         const playHint = document.getElementById('playHint');
         if (playHint) playHint.style.display = 'block';
-      }, 1200); // 1.2s delay
+      }, 1300); // Wartezeit wichtig
     });
     spotifyPlayer.addListener('not_ready', ({ device_id }) => {
-      console.log('Device ID has gone offline', device_id);
       setStatus("Player not ready.");
       hidePlayer();
     });
@@ -215,21 +210,17 @@ function initSpotifyPlayer() {
       setStatus(isPlaying ? "Playing" : "Paused");
     });
     spotifyPlayer.addListener('initialization_error', ({ message }) => {
-      console.error('Failed to initialize:', message);
       setStatus("Player initialization failed.");
     });
     spotifyPlayer.addListener('authentication_error', ({ message }) => {
-      console.error('Failed to authenticate:', message);
       localStorage.removeItem('spotify_access_token');
       setStatus("Authentication failed.");
       showLoginBtn("Sign in again.");
     });
     spotifyPlayer.addListener('account_error', ({ message }) => {
-      console.error('Failed to validate Spotify account:', message);
       setStatus("Account validation failed. Premium required.");
     });
     spotifyPlayer.addListener('playback_error', ({ message }) => {
-      console.error('Failed to perform playback:', message);
       setStatus("Playback error.");
     });
     spotifyPlayer.connect();
@@ -238,19 +229,15 @@ function initSpotifyPlayer() {
 
 // === PLAYER CONTROLS ===
 window.togglePlayback = function() {
-  if (!userInteractionDetected) {
-    console.log('Ignoring play/pause - no user interaction');
-    return;
-  }
-  if (!spotifyPlayer) return;
-  spotifyPlayer.togglePlay().then(() => {
-    console.log('Toggled playback after user interaction');
-  }).catch(error => {
-    console.error('Error toggling playback:', error);
-  });
+  userInteractionDetected = true;
+  if (spotifyPlayer) spotifyPlayer.togglePlay();
+  const hint = document.getElementById('playHint');
+  if(hint) hint.style.display = 'none';
 };
+window.nextTrack = function() { if (spotifyPlayer) spotifyPlayer.nextTrack(); };
+window.previousTrack = function() { if (spotifyPlayer) spotifyPlayer.previousTrack(); };
 
-// Playlist-/Album-/Track-Auswahl & Playback:
+// === SPOTIFY API HELPERS ===
 async function fetchSpotify(url) {
   const token = localStorage.getItem('spotify_access_token');
   const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
@@ -296,13 +283,6 @@ async function populateTrackList(type, id) {
     const li = document.createElement('li');
     li.textContent = `${tr.name} – ${(tr.artists[0]?.name || '')}`;
     li.className = 'touchListItem';
-    li.style.padding = '7px';
-    li.style.fontSize = '0.92rem';
-    li.style.background = '#232323';
-    li.style.marginBottom = '2px';
-    li.style.borderRadius = '9px';
-    li.style.cursor = 'pointer';
-    // Playtrack per User-Tap
     li.onclick = () => {
       playTrackURI(tr.uri);
       setStatus("Wiedergabe gestartet [" + tr.name + "]");
@@ -312,31 +292,23 @@ async function populateTrackList(type, id) {
     ul.appendChild(li);
   });
 }
-
-// User-Tap ist Pflicht für dauerhafte Wiedergabe!
 async function playTrackURI(uri) {
   const token = localStorage.getItem('spotify_access_token');
   await fetch('https://api.spotify.com/v1/me/player/play', {
     method: 'PUT',
-    headers: {
-      'Authorization': 'Bearer ' + token,
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
     body: JSON.stringify({ uris: [uri] })
   });
+  const hint = document.getElementById('playHint');
+  if(hint) hint.style.display = 'none';
 }
 
-// Touch-freundliche Controls & Eventhandler
+// === TOUCH- & INIT EVENT BINDINGS ===
 document.addEventListener('DOMContentLoaded', function() {
   const loginBtn = document.getElementById('loginBtn');
   if (loginBtn) loginBtn.onclick = window.doLoginFlow;
   const playBtn = document.getElementById('playPauseBtn');
-  if (playBtn) playBtn.onclick = function() {
-    userInteractionDetected = true;
-    if (spotifyPlayer) spotifyPlayer.togglePlay();
-    const hint = document.getElementById('playHint');
-    if(hint) hint.style.display = 'none';
-  };
+  if (playBtn) playBtn.onclick = window.togglePlayback;
   const nextBtn = document.getElementById('nextBtn');
   if (nextBtn) nextBtn.onclick = window.nextTrack;
   const prevBtn = document.getElementById('prevBtn');
@@ -345,7 +317,6 @@ document.addEventListener('DOMContentLoaded', function() {
   if (playlistSel) playlistSel.onchange = function() { populateTrackList('playlist', this.value); };
   const albumSel = document.getElementById('albumSelect');
   if (albumSel) albumSel.onchange = function() { populateTrackList('album', this.value); };
-
   // Init nach Login
   if (!handleRedirectCallback()) {
     const token = localStorage.getItem('spotify_access_token');
@@ -369,11 +340,6 @@ async function setupRabbitAlbumPlaylistUI() {
   if (playlistSelect && playlistSelect.value) populateTrackList('playlist', playlistSelect.value);
 }
 
-// Weiter- und Zurücktrack
-window.nextTrack = function() { if (spotifyPlayer) spotifyPlayer.nextTrack(); };
-window.previousTrack = function() { if (spotifyPlayer) spotifyPlayer.previousTrack(); };
-
-// CLEANUP
 window.addEventListener('beforeunload', function() {
   if (spotifyPlayer) {
     spotifyPlayer.disconnect();
