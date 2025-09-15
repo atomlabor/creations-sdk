@@ -1,4 +1,4 @@
-// --- Spotify Auth/Token-Utility (Production Robust) ---
+// --- Spotify Auth/Token-Utility (unchanged, PKCE & robust) ---
 const SPOTIFY_CLIENT_ID = 'f28477d2f23444739d1f6911c1d6be9d';
 const SPOTIFY_REDIRECT_URI = 'https://atomlabor.github.io/rabbit-r1-apps/plugin-demo/spotify-miniplayer/';
 const SPOTIFY_SCOPES = [
@@ -9,8 +9,6 @@ const SPOTIFY_SCOPES = [
     'user-library-read',
     'streaming'
 ];
-
-// --- PKCE helper functions ---
 function generateCodeVerifier() {
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
     const randomValues = crypto.getRandomValues(new Uint8Array(64));
@@ -66,215 +64,100 @@ async function loginWithSpotify() {
     window.location.href = `https://accounts.spotify.com/authorize?${params}`;
 }
 
-// --- SPOTIFY MINIPLAYER-CLASS ---
-class SpotifyMiniplayerR1 {
+// --- spotify r1mote REMOTE-APP ---
+class SpotifyR1mote {
     constructor(token) {
         this.token = token;
-        this.currentFocus = 0;
-        this.isPlaying = false;
-        this.currentTrack = null;
-        this.albums = [];
+        this.deviceList = [];
+        this.deviceIndex = 0;
+        this.currentDeviceId = null;
         this.init();
         this.setupHardwareListeners();
-        if(this.token) this.loadSpotifyData();
+        if(this.token) this.updateDevices();
     }
     init() {
         this.playBtn = document.getElementById('playBtn');
         this.prevBtn = document.getElementById('prevBtn');
         this.nextBtn = document.getElementById('nextBtn');
-        this.albumsGrid = document.getElementById('albumsGrid');
+        this.deviceSelect = document.getElementById('deviceSelect');
         this.trackTitle = document.getElementById('trackTitle');
         this.trackArtist = document.getElementById('trackArtist');
         this.albumArt = document.getElementById('albumArt');
-        this.r1Status = document.getElementById('r1Status');
         this.loginBtn = document.getElementById('loginSpotify');
-        if(this.loginBtn) this.loginBtn.style.display = "none";
+        // Cover Placeholder
+        if(this.albumArt) {
+            this.albumArt.src = "BlankCoverArt.png";
+            this.albumArt.alt = "No Album Art";
+        }
+        this.trackTitle.textContent = "Kein Track ausgewählt";
+        this.trackArtist.textContent = "spotify r1mote";
+        if (this.loginBtn) this.loginBtn.style.display = "none";
         if(this.playBtn) this.playBtn.addEventListener('click', () => this.togglePlayback());
         if(this.prevBtn) this.prevBtn.addEventListener('click', () => this.previousTrack());
         if(this.nextBtn) this.nextBtn.addEventListener('click', () => this.nextTrack());
+        if(this.deviceSelect) this.deviceSelect.addEventListener('change', () => this.selectDevice(this.deviceSelect.selectedIndex));
     }
     setupHardwareListeners() {
-        window.addEventListener("sideClick", () => {
-            this.togglePlayback();
-            this.showHardwareFeedback("⏯ Play/Pause");
-        });
         window.addEventListener("scrollUp", () => {
-            this.navigateUp();
-            this.showHardwareFeedback("⬆ Hoch");
+            if (this.deviceList.length === 0) return;
+            this.deviceIndex = Math.max(this.deviceIndex - 1, 0);
+            this.deviceSelect.selectedIndex = this.deviceIndex;
+            this.selectDevice(this.deviceIndex);
+            this.showHardwareFeedback("⬆ Device: " + this.deviceList[this.deviceIndex].name);
         });
         window.addEventListener("scrollDown", () => {
-            this.navigateDown();
-            this.showHardwareFeedback("⬇ Runter");
+            if (this.deviceList.length === 0) return;
+            this.deviceIndex = Math.min(this.deviceIndex + 1, this.deviceList.length - 1);
+            this.deviceSelect.selectedIndex = this.deviceIndex;
+            this.selectDevice(this.deviceIndex);
+            this.showHardwareFeedback("⬇ Device: " + this.deviceList[this.deviceIndex].name);
         });
-        window.addEventListener("touchClick", (event) => {
-            const focusedElement = document.querySelector('.album-item.focused');
-            if (focusedElement) this.selectAlbum(parseInt(focusedElement.dataset.index));
-        });
+        window.addEventListener("sideClick", () => this.togglePlayback());
     }
-    async loadSpotifyData() {
+    async updateDevices() {
         try {
-            const response = await fetch('https://api.spotify.com/v1/me/player/recently-played?limit=7', {
+            const resp = await fetch('https://api.spotify.com/v1/me/devices', {
                 headers: { 'Authorization': 'Bearer ' + this.token }
             });
-            if (!response.ok) {
-                this.showHardwareFeedback("⚠️ Spotify-Fehler beim Laden!");
-                if (this.loginBtn) this.loginBtn.style.display = "block";
-                this.albums = [];
-                this.renderAlbums();
-                return;
-            }
-            const json = await response.json();
-            const items = Array.isArray(json.items) ? json.items : [];
-            if (!items.length) {
-                this.albums = [];
-                this.renderAlbums();
-                this.showHardwareFeedback("Keine letzten Alben.");
-                return;
-            }
-            this.albums = items.map(item => ({
-                title: item.track?.name ?? '[Kein Titel]',
-                artist: item.track?.artists?.map(a => a.name).join(', ') ?? '[Unbekannt]',
-                artwork: item.track?.album?.images?.[0]?.url ?? '',
-                uri: item.track?.uri ?? ''
-            })).filter(album => album.uri);
-
-            this.renderAlbums();
-
-            if (this.albums.length === 0) {
-                this.showHardwareFeedback("Keine gültige Albumauswahl.");
-            }
-            await this.updateCurrentFromAPI();
+            const json = await resp.json();
+            this.deviceList = (json.devices||[]).filter(d => d.is_restricted === false);
+            this.renderDeviceDropdown();
+            if (this.deviceList.length > 0) this.selectDevice(this.deviceIndex);
+            else this.showHardwareFeedback('Keine Connect-Geräte verfügbar!');
         } catch(e) {
-            this.showHardwareFeedback("⚠️ API-/Netzwerkfehler!");
-            if(this.loginBtn) this.loginBtn.style.display = "block";
-            this.albums = [];
-            this.renderAlbums();
+            this.showHardwareFeedback("Fehler beim Abrufen der Geräte.");
         }
     }
-    async updateCurrentFromAPI() {
-        try {
-            const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
-                headers: { 'Authorization': 'Bearer ' + this.token }
-            });
-            if(!response.ok) return;
-            const data = await response.json();
-            if(data.item) {
-                this.currentTrack = {
-                    title: data.item.name,
-                    artist: data.item.artists.map(a => a.name).join(", "),
-                    artwork: data.item.album.images[0]?.url,
-                    uri: data.item.uri
-                };
-                this.updateCurrentTrack();
-            }
-        } catch(e){ /* fallback */ }
+    renderDeviceDropdown() {
+        this.deviceSelect.innerHTML = "";
+        this.deviceList.forEach((device, i) => {
+            const opt = document.createElement("option");
+            opt.value = device.id;
+            opt.innerText = device.name + (device.is_active ? " (aktiv)" : "");
+            this.deviceSelect.appendChild(opt);
+        });
+        this.deviceIndex = 0;
+        this.deviceSelect.selectedIndex = this.deviceIndex;
     }
-    navigateUp() {
-        if (this.albums.length === 0) return;
-        this.currentFocus = Math.max(this.currentFocus - 1, 0);
-        this.updateFocus();
+    selectDevice(index) {
+        if (this.deviceList.length === 0) return;
+        this.deviceIndex = index;
+        this.currentDeviceId = this.deviceList[index]?.id;
+        this.showHardwareFeedback("Steuerung: " + this.deviceList[index].name);
     }
-    navigateDown() {
-        if (this.albums.length === 0) return;
-        this.currentFocus = Math.min(this.currentFocus + 1, this.albums.length - 1);
-        this.updateFocus();
-    }
-    updateFocus() {
-        document.querySelectorAll('.album-item').forEach(item => item.classList.remove('focused'));
-        const currentItem = document.querySelector(`[data-index="${this.currentFocus}"]`);
-        if (currentItem) {
-            currentItem.classList.add('focused');
-            currentItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-    }
-    selectAlbum(index) {
-        if (index >= 0 && index < this.albums.length) {
-            this.currentTrack = this.albums[index];
-            this.updateCurrentTrack();
-            this.playThisTrack(this.currentTrack);
-            this.showHardwareFeedback(`♪ ${this.currentTrack.title}`);
-        }
-    }
-    async playThisTrack(track) {
-        const deviceId = window._rabbit_r1_device_id;
-        if (!deviceId || !track || !track.uri) {
-            this.showHardwareFeedback("⛔ Kein Song auswählbar/Device nicht bereit.");
+    async playOnCurrentDevice(endpoint) {
+        if (!this.currentDeviceId) {
+            this.showHardwareFeedback("Kein Device gewählt!");
             return;
         }
-        await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
-            method: "PUT",
-            headers: {
-                'Authorization': 'Bearer ' + this.token,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ uris: [track.uri] })
-        });
-    }
-    async togglePlayback() {
-        const deviceId = window._rabbit_r1_device_id;
-        if(!this.token || !deviceId) return;
-        this.isPlaying = !this.isPlaying;
-        const endpoint = `https://api.spotify.com/v1/me/player/${this.isPlaying ? "play" : "pause"}?device_id=${deviceId}`;
-        await fetch(endpoint, { method: "PUT", headers: { 'Authorization': 'Bearer ' + this.token } });
-        this.playBtn.textContent = this.isPlaying ? "⏸" : "▶";
-        this.playBtn.style.background = this.isPlaying ?
-            "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.7)";
-        this.updateCurrentFromAPI();
-    }
-    async previousTrack() {
-        const deviceId = window._rabbit_r1_device_id;
-        if(!this.token || !deviceId) return;
-        await fetch(`https://api.spotify.com/v1/me/player/previous?device_id=${deviceId}`, {
-            method: "POST",
+        await fetch(`https://api.spotify.com/v1/me/player/${endpoint}?device_id=${this.currentDeviceId}`, {
+            method: endpoint === "play" || endpoint === "pause" ? "PUT" : "POST",
             headers: { 'Authorization': 'Bearer ' + this.token }
         });
-        setTimeout(()=>this.updateCurrentFromAPI(), 1000);
     }
-    async nextTrack() {
-        const deviceId = window._rabbit_r1_device_id;
-        if(!this.token || !deviceId) return;
-        await fetch(`https://api.spotify.com/v1/me/player/next?device_id=${deviceId}`, {
-            method: "POST",
-            headers: { 'Authorization': 'Bearer ' + this.token }
-        });
-        setTimeout(()=>this.updateCurrentFromAPI(), 1000);
-    }
-    updateCurrentTrack() {
-        if (!this.currentTrack) return;
-        const cover = this.currentTrack.artwork && this.currentTrack.artwork.trim() ? this.currentTrack.artwork : 'BlankCoverArt.png';
-        this.trackTitle.textContent = this.currentTrack.title;
-        this.trackArtist.textContent = this.currentTrack.artist;
-        this.albumArt.src = cover;
-        this.albumArt.alt = `${this.currentTrack.title} Artwork`;
-    }
-    renderAlbums() {
-        this.albumsGrid.innerHTML = '';
-        if (!this.albums || this.albums.length === 0) {
-            this.albumsGrid.innerHTML = '<div style="padding:8px;color:#fff;font-size:10px;">Keine abspielbaren Albumtitel gefunden.</div>';
-            return;
-        }
-        this.albums.forEach((album, index) => {
-            const albumItem = document.createElement('div');
-            albumItem.className = 'album-item';
-            albumItem.dataset.index = index;
-            albumItem.tabIndex = 0;
-            const cover = album.artwork && album.artwork.trim() ? album.artwork : 'BlankCoverArt.png';
-            albumItem.innerHTML = `
-                <img src="${cover}" alt="${album.title}"/>
-                <div class="album-info">
-                    <div class="album-title">${album.title}</div>
-                    <div class="album-artist">${album.artist}</div>
-                </div>
-            `;
-            albumItem.addEventListener('click', () => {
-                this.currentFocus = index;
-                this.selectAlbum(index);
-                this.updateFocus();
-            });
-            this.albumsGrid.appendChild(albumItem);
-        });
-        if (this.albums.length > 0) this.updateFocus();
-    }
+    async togglePlayback() { await this.playOnCurrentDevice("play"); }
+    async previousTrack()  { await this.playOnCurrentDevice("previous"); }
+    async nextTrack()      { await this.playOnCurrentDevice("next"); }
     showHardwareFeedback(message) {
         const existingFeedback = document.querySelector('.hardware-feedback');
         if (existingFeedback) { existingFeedback.remove(); }
@@ -290,20 +173,6 @@ class SpotifyMiniplayerR1 {
     }
 }
 
-// --- Web Playback SDK ---
-window.onSpotifyWebPlaybackSDKReady = () => {
-    const token = getAccessToken();
-    const player = new Spotify.Player({
-        name: 'Rabbit R1 Miniplayer',
-        getOAuthToken: cb => cb(token),
-        volume: 0.7
-    });
-    player.addListener('ready', ({ device_id }) => {
-        window._rabbit_r1_device_id = device_id;
-    });
-    player.connect();
-};
-
 // --- DOMContentLoaded: Auth/Start & Token-Validation ---
 document.addEventListener('DOMContentLoaded', async () => {
     const loginBtn = document.getElementById('loginSpotify');
@@ -316,12 +185,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 headers: { Authorization: 'Bearer ' + token }
             });
             valid = testResp.ok;
-        } catch(e){
-            valid = false;
-        }
+        } catch(e){ valid = false; }
     }
     if (token && valid) {
-        new SpotifyMiniplayerR1(token);
+        new SpotifyR1mote(token);
     } else {
         window.localStorage.removeItem('spotify_token');
         if (loginBtn) loginBtn.style.display = "block";
