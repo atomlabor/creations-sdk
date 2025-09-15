@@ -27,9 +27,24 @@ function getAccessToken() {
 }
 
 function loginWithSpotify() {
-    const url = `https://accounts.spotify.com/authorize?client_id=${SPOTIFY_CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(SPOTIFY_REDIRECT_URI)}&scope=${encodeURIComponent(SPOTIFY_SCOPES.join(' '))}`;
+    const clientId = 'f28477d2f23444739d1f6911c1d6be9d';
+    const redirectUri = 'https://atomlabor.github.io/rabbit-r1-apps/plugin-demo/spotify-miniplayer/';
+    const scopes = [
+        'user-read-playback-state',
+        'user-modify-playback-state',
+        'user-read-currently-playing',
+        'playlist-read-private',
+        'user-library-read',
+        'streaming'
+    ];
+    const url = 'https://accounts.spotify.com/authorize' +
+      '?response_type=token' +                         // << HIER: "token" und nichts anderes
+      '&client_id=' + encodeURIComponent(clientId) +
+      '&redirect_uri=' + encodeURIComponent(redirectUri) +
+      '&scope=' + encodeURIComponent(scopes.join(' '));
     window.location = url;
 }
+
 
 // --- SPOTIFY MINIPLAYER-CLASS ---
 class SpotifyMiniplayerR1 {
