@@ -1,50 +1,53 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>spotify r1mote</title>
     <meta name="viewport" content="width=240,initial-scale=1,user-scalable=no">
-    <meta name="description" content="Spotify Connect Fernbedienung für Rabbit R1">
+    <meta name="description" content="Spotify Connect Remote for Rabbit R1">
     <link rel="stylesheet" href="style.css">
-    <!-- Spotify Web Playback SDK, falls im Browser nötig -->
     <script src="https://sdk.scdn.co/spotify-player.js"></script>
 </head>
 <body>
     <div class="r1-app-container">
+        <div class="about-box">
+            <b>spotify r1mote</b><br>
+            <span>This app lets you control all your Spotify Connect devices.<br>
+            Log in, select a device, and use the hardware wheel or buttons to play, pause, skip tracks or go back.<br><br>
+            <i>Your music will play on the selected device!</i>
+            </span>
+        </div>
         <div class="miniplayer-container">
 
             <div class="current-track" id="currentTrack">
                 <div class="track-artwork" id="trackArtwork">
-                    <!-- Cover-Placeholder (immer sichtbar) -->
                     <img src="BlankCoverArt.png" alt="Album Art" id="albumArt" width="48" height="48">
                 </div>
                 <div class="track-info">
-                    <div class="track-title" id="trackTitle">Kein Track ausgewählt</div>
+                    <div class="track-title" id="trackTitle">No track selected</div>
                     <div class="track-artist" id="trackArtist">spotify r1mote</div>
                     <select id="deviceSelect" style="width:100%;margin-top:6px;border-radius:6px;font-size:11px;padding:3px 0;"></select>
                 </div>
             </div>
 
             <div class="player-controls">
-                <button class="control-btn" id="prevBtn" title="Vorheriges Gerät (⏮️ oder Album)"><span>⏮️</span></button>
-                <button class="control-btn primary" id="playBtn" title="Play/Pause"><span>▶️</span></button>
-                <button class="control-btn" id="nextBtn" title="Nächstes Gerät (⏭️ oder Album)"><span>⏭️</span></button>
+                <button class="control-btn" id="prevBtn" title="Previous Track">Prev</button>
+                <button class="control-btn primary" id="playBtn" title="Play/Pause">Play/Pause</button>
+                <button class="control-btn" id="nextBtn" title="Next Track">Next</button>
             </div>
 
-            <!-- Rückmeldungen für Hardware/Status -->
             <div id="r1Status" class="r1-status" style="margin-top:4px;text-align:center;"></div>
 
-            <button id="loginSpotify" style="margin-top:11px;display:none;width:100%;border-radius:6px;padding:8px 0;font-size:12px;font-weight:bold;background:#1db954;color:#fff;cursor:pointer;">
-                Bei Spotify einloggen
+            <button id="loginSpotify" style="margin-top:14px;display:none;width:100%;border-radius:6px;padding:10px 0;font-size:13px;font-weight:bold;background:#1db954;color:#fff;cursor:pointer;">
+                Log in with Spotify
             </button>
 
         </div>
-        <div style="font-size:9px;text-align:center;margin:5px 0 1px 0;opacity:.7;">
-            ◦ Scroll-/Hardwarewheel: Device wechseln | Play/Pause: seitlicher Button
+        <div style="font-size:9.4px;text-align:center;margin:7px 0 2px 0;opacity:.69;">
+            Use the hardware wheel: select device<br>
+            Side button: Play/Pause
         </div>
     </div>
-    
-    <!-- Feedback für User-Aktionen -->
     <style>
         .hardware-feedback {
             position: absolute;
@@ -52,15 +55,26 @@
             transform: translate(-50%, -50%);
             background: rgba(0,0,0,0.8);
             color: white;
-            padding: 7px 12px;
-            border-radius: 7px;
-            font-size: 11px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
             opacity: 0;
             transition: opacity 0.3s;
             pointer-events: none;
             z-index: 1000;
         }
         .hardware-feedback.show { opacity: 1; }
+        .about-box {
+            background: rgba(0,0,0,0.51);
+            color: #f6f6f6;
+            font-size: 12px;
+            padding: 10px 10px 14px 10px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            line-height: 1.4;
+            width: 100%;
+            text-align: center;
+        }
     </style>
     <script src="miniplayer.js"></script>
 </body>
