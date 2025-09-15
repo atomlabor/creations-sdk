@@ -17,13 +17,12 @@
               <img src="BlankCoverArt.png" alt="Album Art" id="albumArt" width="42" height="42">
           </div>
           <div class="track-info">
-              <div class="track-title" id="trackTitle">No track selected</div>
-              <div class="track-artist" id="trackArtist">spotify r1mote</div>
+              <div class="track-title prominent" id="trackTitle">spotify r1mote</div>
+              <div class="track-artist" id="trackArtist"></div>
               <select id="deviceSelect"></select>
               <div class="about-tiny">
-                  This app lets you control all your Spotify Connect devices.<br>
-                  Log in, select a device, and use the hardware or on-screen buttons to control playback.<br>
-                  Your music will play on the selected device.
+                  Control your Spotify Connect devices.<br>
+                  Log in, pick a device, then use hardware or on-screen buttons for playback. The current song's cover and title are always shown below.
               </div>
           </div>
       </div>
@@ -40,6 +39,7 @@
              <svg class="svg-btn" width="20" height="20" viewBox="0 0 20 20"><polygon points="6,4 13,10 6,16" fill="white"/><rect x="14" y="4" width="2.1" height="12" rx="1.05" fill="white"/></svg>
           </button>
       </div>
+      <div class="current-song-title" id="currentSong"></div>
       <div id="r1Status" class="r1-status"></div>
     </div>
     <button id="loginSpotify">
@@ -47,7 +47,7 @@
     </button>
   </div>
   <div class="hardware-legend">
-    Use the hardware wheel to select a device. Side button: Play/Pause.
+    Use the wheel for device selection & buttons for playback.
   </div>
   <style>
     .hardware-feedback {
