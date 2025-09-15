@@ -1,74 +1,47 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=240, height=282, initial-scale=1.0, user-scalable=no">
-  <title>Rabbit R1 Spotify Miniplayer</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=240, height=282">
+    <title>Spotify Miniplayer - Rabbit R1</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="miniplayer.css">
 </head>
 <body>
-  <!-- Rabbit R1 Hardware Indicator -->
-  <div id="hardwareIndicator" class="r1-hardware-indicator" aria-live="polite">
-    <span id="hardwareStatus">🎵 Rabbit R1 Ready</span>
-  </div>
+    <div class="r1-app-container">
+        <div class="miniplayer-container">
+            <!-- Aktueller Track -->
+            <div class="current-track" id="currentTrack">
+                <div class="track-artwork" id="trackArtwork">
+                    <img src="https://via.placeholder.com/120x120?text=No+Track" alt="Album Art" id="albumArt">
+                </div>
+                <div class="track-info">
+                    <div class="track-title" id="trackTitle">Kein Track ausgewählt</div>
+                    <div class="track-artist" id="trackArtist">Spotify Miniplayer</div>
+                </div>
+            </div>
 
-  <!-- Login Section -->
-  <div id="loginSection" class="r1-login-section">
-    <div class="r1-login-content">
-      <div class="r1-logo">🎵</div>
-      <h2 class="r1-title">Spotify Premium</h2>
-      <p class="r1-subtitle">Verbinde dein Spotify-Konto für Musikwiedergabe</p>
-      <button id="loginBtn" class="r1-primary-btn r1-focusable" tabindex="0" 
-              data-r1-action="login" aria-label="Mit Spotify verbinden">
-        Mit Spotify verbinden
-      </button>
+            <!-- Controls -->
+            <div class="player-controls">
+                <button class="control-btn" id="prevBtn" tabindex="0">⏮</button>
+                <button class="control-btn primary" id="playBtn" tabindex="0">▶</button>
+                <button class="control-btn" id="nextBtn" tabindex="0">⏭</button>
+            </div>
+
+            <!-- Recent Albums - Scrollbar Navigation -->
+            <div class="recent-albums" id="recentAlbums">
+                <div class="albums-header">Kürzlich gespielt</div>
+                <div class="albums-grid" id="albumsGrid">
+                    <!-- Wird dynamisch befüllt -->
+                </div>
+            </div>
+
+            <!-- R1 Hardware Status -->
+            <div class="r1-status" id="r1Status">
+                <span class="status-text">◦ Scroll: Album auswählen | Side: Play/Pause</span>
+            </div>
+        </div>
     </div>
-  </div>
-
-  <!-- Player Controls -->
-  <div id="playerControls" class="r1-player-container" style="display:none;">
-    <!-- Album Art -->
-    <div class="r1-album-section">
-      <img id="albumArt" class="r1-album-art r1-focusable" tabindex="0" 
-           alt="Albumcover" data-r1-action="toggle-play" 
-           src="" aria-label="Aktueller Song - Zum Abspielen antippen">
-    </div>
-
-    <!-- Track Info -->
-    <div class="r1-track-info">
-      <div id="trackName" class="r1-track-title" aria-live="polite">Kein Song ausgewählt</div>
-      <div id="artistName" class="r1-track-artist" aria-live="polite"></div>
-    </div>
-
-    <!-- Main Controls -->
-    <div class="r1-controls-main">
-      <button id="prevBtn" class="r1-control-btn r1-focusable" tabindex="0" 
-              data-r1-action="previous" aria-label="Vorheriger Song">
-        <span class="r1-icon">⏮</span>
-      </button>
-      
-      <button id="playPauseBtn" class="r1-play-btn r1-focusable" tabindex="0" 
-              data-r1-action="play-pause" aria-label="Abspielen/Pausieren">
-        <span id="playIcon" class="r1-play-icon">▶</span>
-        <span id="pauseIcon" class="r1-pause-icon" style="display:none;">⏸</span>
-      </button>
-      
-      <button id="nextBtn" class="r1-control-btn r1-focusable" tabindex="0" 
-              data-r1-action="next" aria-label="Nächster Song">
-        <span class="r1-icon">⏭</span>
-      </button>
-    </div>
-
-    <!-- Status Display -->
-    <div id="status" class="r1-status" aria-live="polite"></div>
-    <div id="playHint" class="r1-play-hint">➔ Song oder Play-Button antippen!</div>
-
-    <!-- Recent Albums -->
-    <div id="recentAlbums" class="r1-recent-albums">
-      <!-- Dynamically populated recent albums with r1-focusable class -->
-    </div>
-  </div>
-
-  <script src="miniplayer.js"></script>
+    <script src="miniplayer.js"></script>
 </body>
 </html>
