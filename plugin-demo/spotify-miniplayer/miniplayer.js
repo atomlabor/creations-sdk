@@ -137,17 +137,18 @@ function handleRedirectCallback() {
         setupRabbitAlbumPlaylistUI();
         const playHint = document.getElementById('playHint');
         if (playHint) playHint.style.display = 'block';
-     } else {
+  } else {
     console.error('Token exchange failed:', data);
-    setStatus("Authorization failed: " + JSON.stringify(data)); // <--- NEU!
+    setStatus("Authorization failed.");
     showLoginBtn("Try again.");
   }
 })
 .catch(error => {
   console.error('Token exchange error:', error);
-  setStatus("Authorization error: " + error); // <--- NEU!
+  setStatus("Authorization error.");
   showLoginBtn("Try again.");
 });
+
     return true;
   }
   return false;
