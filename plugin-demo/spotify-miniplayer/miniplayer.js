@@ -9,6 +9,7 @@ const SPOTIFY_SCOPES = [
     'user-library-read',
     'streaming'
 ];
+
 // --- PKCE helper functions ---
 function generateCodeVerifier() {
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
@@ -118,23 +119,36 @@ class SpotifyMiniplayerR1 {
             if (!response.ok) {
                 this.showHardwareFeedback("⚠️ Spotify-Fehler beim Laden!");
                 if (this.loginBtn) this.loginBtn.style.display = "block";
-                console.warn('[Spotify API]', await response.text());
+                this.albums = [];
+                this.renderAlbums();
                 return;
             }
             const json = await response.json();
-            this.albums = (json.items ?? []).map(item => ({
-                title: item.track.name,
-                artist: item.track.artists.map(a => a.name).join(', '),
-                artwork: item.track.album.images[0]?.url,
-                uri: item.track.uri
+            const items = Array.isArray(json.items) ? json.items : [];
+            if (!items.length) {
+                this.albums = [];
+                this.renderAlbums();
+                this.showHardwareFeedback("Keine letzten Alben.");
+                return;
+            }
+            this.albums = items.map(item => ({
+                title: item.track?.name ?? '[Kein Titel]',
+                artist: item.track?.artists?.map(a => a.name).join(', ') ?? '[Unbekannt]',
+                artwork: item.track?.album?.images?.[0]?.url ?? '',
+                uri: item.track?.uri ?? ''
             })).filter(album => album.uri);
+
             this.renderAlbums();
-            if (this.albums.length === 0) this.showHardwareFeedback("Keine letzten Alben.");
+
+            if (this.albums.length === 0) {
+                this.showHardwareFeedback("Keine gültige Albumauswahl.");
+            }
             await this.updateCurrentFromAPI();
         } catch(e) {
-            this.showHardwareFeedback("⚠️ Netzwerk-/API-Fehler!");
-            if (this.loginBtn) this.loginBtn.style.display = "block";
-            console.error('[Miniplayer] API Error: ', e);
+            this.showHardwareFeedback("⚠️ API-/Netzwerkfehler!");
+            if(this.loginBtn) this.loginBtn.style.display = "block";
+            this.albums = [];
+            this.renderAlbums();
         }
     }
     async updateCurrentFromAPI() {
@@ -187,23 +201,14 @@ class SpotifyMiniplayerR1 {
             this.showHardwareFeedback("⛔ Kein Song auswählbar/Device nicht bereit.");
             return;
         }
-        try {
-            const response = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
-                method: "PUT",
-                headers: {
-                    'Authorization': 'Bearer ' + this.token,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ uris: [track.uri] })
-            });
-            if (!response.ok) {
-                this.showHardwareFeedback("❗ Wiedergabe-Fehler (" + response.status + ")");
-                console.warn('[Spotify Play Error]', await response.text());
-            }
-        } catch(e) {
-            this.showHardwareFeedback("❗ Fehler beim Abspielen!");
-            console.error('[Play API] ', e);
-        }
+        await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+            method: "PUT",
+            headers: {
+                'Authorization': 'Bearer ' + this.token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ uris: [track.uri] })
+        });
     }
     async togglePlayback() {
         const deviceId = window._rabbit_r1_device_id;
@@ -245,7 +250,7 @@ class SpotifyMiniplayerR1 {
     renderAlbums() {
         this.albumsGrid.innerHTML = '';
         if (!this.albums || this.albums.length === 0) {
-            this.albumsGrid.innerHTML = '<div style="padding:8px;color:#fff;font-size:10px;">Keine Albumauswahl verfügbar.</div>';
+            this.albumsGrid.innerHTML = '<div style="padding:8px;color:#fff;font-size:10px;">Keine abspielbaren Albumtitel gefunden.</div>';
             return;
         }
         this.albums.forEach((album, index) => {
@@ -285,7 +290,7 @@ class SpotifyMiniplayerR1 {
     }
 }
 
-// --- Web Playback SDK-Integration mit Logging ---
+// --- Web Playback SDK ---
 window.onSpotifyWebPlaybackSDKReady = () => {
     const token = getAccessToken();
     const player = new Spotify.Player({
@@ -295,23 +300,11 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     });
     player.addListener('ready', ({ device_id }) => {
         window._rabbit_r1_device_id = device_id;
-        console.log('Rabbit R1 Miniplayer ist bereit mit Device ID', device_id);
     });
-    player.addListener('not_ready', ({ device_id }) => {
-        console.log('Rabbit R1 Miniplayer nicht bereit', device_id);
-    });
-    player.addListener('initialization_error', e => console.error('Player Init Error', e));
-    player.addListener('authentication_error', e => {
-        window.localStorage.removeItem('spotify_token');
-        alert("❌ Spotify-Token ungültig. Bitte erneut einloggen!");
-        window.location.reload();
-    });
-    player.addListener('account_error', e => alert("⚠️ Spotify Account-Problem: " + e.message));
-    player.addListener('playback_error', e => alert("❌ Playback Error: " + e.message));
     player.connect();
 };
 
-// --- DOMContentLoaded: Auth/Start + Token-Validierung ---
+// --- DOMContentLoaded: Auth/Start & Token-Validation ---
 document.addEventListener('DOMContentLoaded', async () => {
     const loginBtn = document.getElementById('loginSpotify');
     if (loginBtn) loginBtn.onclick = loginWithSpotify;
