@@ -20,27 +20,35 @@
               <div class="track-title" id="trackTitle">No track selected</div>
               <div class="track-artist" id="trackArtist">spotify r1mote</div>
               <select id="deviceSelect"></select>
-              <div class="about-tiny">This app lets you control all your Spotify Connect devices. Log in, select a device, and use hardware or on-screen buttons to control playback. Your music will play on the selected device.</div>
+              <div class="about-tiny">
+                  This app lets you control all your Spotify Connect devices.<br>
+                  Log in, select a device, and use the hardware or on-screen buttons to control playback.<br>
+                  Your music will play on the selected device.
+              </div>
           </div>
       </div>
 
       <div class="player-controls">
-          <button class="control-btn" id="prevBtn" title="Previous Track">Prev</button>
-          <button class="control-btn primary" id="playBtn" title="Play/Pause">Play/Pause</button>
-          <button class="control-btn" id="nextBtn" title="Next Track">Next</button>
+          <button class="control-btn" id="prevBtn" title="Previous Track">
+            <svg class="svg-btn" width="20" height="20" viewBox="0 0 20 20"><polygon points="14,16 7,10 14,4" fill="white"/><rect x="4" y="4" width="2.1" height="12" rx="1.05" fill="white"/></svg>
+          </button>
+          <button class="control-btn primary" id="playBtn" title="Play/Pause">
+            <svg id="playIcon" class="svg-btn" width="20" height="20" viewBox="0 0 20 20"><polygon points="7,5 16,10 7,15" fill="white"/></svg>
+            <svg id="pauseIcon" class="svg-btn" width="20" height="20" viewBox="0 0 20 20" style="display:none;"><rect x="6" y="5" width="3.2" height="10" rx="1.1" fill="white"/><rect x="11" y="5" width="3.2" height="10" rx="1.1" fill="white"/></svg>
+          </button>
+          <button class="control-btn" id="nextBtn" title="Next Track">
+             <svg class="svg-btn" width="20" height="20" viewBox="0 0 20 20"><polygon points="6,4 13,10 6,16" fill="white"/><rect x="14" y="4" width="2.1" height="12" rx="1.05" fill="white"/></svg>
+          </button>
       </div>
-
-      <div id="r1Status" class="r1-status" style="margin-top:0;text-align:center;"></div>
+      <div id="r1Status" class="r1-status"></div>
     </div>
-
-    <button id="loginSpotify" style="display:none;">
+    <button id="loginSpotify">
         Log in with Spotify
     </button>
   </div>
   <div class="hardware-legend">
     Use the hardware wheel to select a device. Side button: Play/Pause.
   </div>
-
   <style>
     .hardware-feedback {
         position: absolute;
