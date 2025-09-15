@@ -1,43 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Rabbit R1 Spotify Webplayer Card</title>
-  <meta name="viewport" content="width=240, height=282, user-scalable=no"/>
+  <meta charset="UTF-8">
+  <title>Rabbit R1 Spotify Miniplayer</title>
+  <meta name="viewport" content="width=240, height=282, user-scalable=no">
   <style>
+    /* Rabbit R1 Anpassung - Optimized for small screen and touch controls */
     html, body {
       width: 240px; height: 282px; margin: 0; padding: 0;
       overflow: hidden; background: #191414; color: #fff; font-family: sans-serif;
-      display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start;
+      display: flex; flex-direction: column;
     }
-    #goSpotifyBtn {
-      width: 92%; height: 44px; border-radius: 14px;
-      font-size: 1em; font-weight: bold;
+    
+    /* Rabbit R1 Anpassung - Large touch-friendly login button */
+    #loginBtn {
+      width: 220px; height: 50px; border-radius: 12px;
+      font-size: 16px; font-weight: bold;
       background: #1db954; color: #191414;
-      border: none; margin: 10px 0; cursor: pointer;
-      text-align: left; padding-left: 16px;
+      border: none; margin: 20px auto; cursor: pointer;
+      display: block;
     }
-    #goSpotifyBtn:hover { background: #1ed760; }
-    .hint { font-size:0.92em; padding:10px 12px 4px 12px; text-align:left; margin-bottom: 0;}
-    .hardware { font-size: 0.80em; color: #b3b3b3; padding-left: 12px; text-align:left;}
+    #loginBtn:hover { background: #1ed760; }
+    
+    /* Rabbit R1 Anpassung - Hide player initially, show after login */
+    #playerControls {
+      display: none;
+      flex-direction: column;
+      padding: 10px;
+      height: 100%;
+    }
+    
+    /* Rabbit R1 Anpassung - Album art optimized for small screen */
+    #albumArt {
+      width: 120px; height: 120px;
+      border-radius: 8px;
+      margin: 0 auto 10px auto;
+      display: none;
+    }
+    
+    /* Rabbit R1 Anpassung - Track info with proper spacing */
+    .track-info {
+      text-align: center;
+      margin-bottom: 15px;
+      min-height: 60px;
+    }
+    
+    #trackName {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    #artistName {
+      font-size: 12px;
+      color: #b3b3b3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    /* Rabbit R1 Anpassung - Large touch controls */
+    .controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .control-btn {
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: #333;
+      color: #fff;
+      border: none;
+      font-size: 20px;
+      margin: 0 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .control-btn:hover { background: #555; }
+    
+    #playPauseBtn {
+      background: #1db954;
+      width: 70px; height: 70px;
+      font-size: 24px;
+    }
+    
+    #playPauseBtn:hover { background: #1ed760; }
+    
+    /* Rabbit R1 Anpassung - Status text */
+    #status {
+      text-align: center;
+      font-size: 12px;
+      color: #b3b3b3;
+      margin-top: auto;
+      padding: 10px;
+    }
+    
+    .login-hint {
+      text-align: center;
+      font-size: 14px;
+      color: #b3b3b3;
+      padding: 20px 15px;
+      line-height: 1.4;
+    }
   </style>
 </head>
 <body>
-  <div class="hint">
-    <b>Spotify on Rabbit R1</b><br>
-    Tap to open the official Spotify web player. Full playlist, search & controls, all right on your Rabbit.<br>
+  <!-- Rabbit R1 Anpassung - Login section shown initially -->
+  <div id="loginSection">
+    <div class="login-hint">
+      <strong>Spotify Premium Required</strong><br>
+      Connect your Spotify account to start streaming music on your Rabbit R1.
+    </div>
+    <button id="loginBtn">Connect Spotify</button>
   </div>
-  <button id="goSpotifyBtn">Open Spotify Web Player</button>
-  <div class="hardware">
-    <b>Shortcuts:</b><br>
-    • <b>Rabbit Button:</b> Play/Pause<br>
-    • <b>Scroll Wheel:</b> Change volume or skip tracks (if supported)
+  
+  <!-- Rabbit R1 Anpassung - Player controls shown after login -->
+  <div id="playerControls">
+    <img id="albumArt" alt="Album Art">
+    
+    <div class="track-info">
+      <div id="trackName">No track selected</div>
+      <div id="artistName"></div>
+    </div>
+    
+    <div class="controls">
+      <button class="control-btn" id="prevBtn" title="Previous">⏮️</button>
+      <button class="control-btn" id="playPauseBtn" title="Play">▶️</button>
+      <button class="control-btn" id="nextBtn" title="Next">⏭️</button>
+    </div>
   </div>
-  <script>
-    document.getElementById('goSpotifyBtn').onclick = function() {
-      // Weiterleitung im gleichen Fenster
-      window.location.href = 'https://open.spotify.com/';
-    };
-  </script>
+  
+  <div id="status">Ready to connect</div>
+  
+  <!-- Load the miniplayer JavaScript -->
+  <script src="miniplayer.js"></script>
 </body>
 </html>
