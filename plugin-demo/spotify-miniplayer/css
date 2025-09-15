@@ -1,175 +1,29 @@
-body {
-    margin: 0;
-    padding: 0;
-    background: #11110f;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-}
-.r1-app-container {
-    width: 240px;
-    height: 282px;
-    background: #181818;
-    border-radius: 13px;
-    margin: 8px auto 0 auto;
-    padding: 10px 8px 8px 8px;
-    box-sizing: border-box;
-    font-family: 'SF Pro Display', -apple-system, sans-serif;
-    color: white;
-    box-shadow: 0 4px 18px rgba(42,128,68,0.18);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-.miniplayer-container {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-    justify-content: flex-start;
-}
-.current-track {
-    background: linear-gradient(110deg, #23271d15 0%, #37c97d1e 100%);
-    border-radius: 8px;
-    padding: 7px;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-}
-.track-artwork img {
-    width: 42px;
-    height: 42px;
-    border-radius: 6px;
-    object-fit: cover;
-    background: #242926;
-    border: 1.2px solid #19c35516;
-}
-.track-info {
-    flex: 1 1 auto;
-    overflow: hidden;
-    min-width: 0;
-}
-.track-title {
-    font-size: 12.5px;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-bottom: 0.5px;
-}
-.track-artist {
-    font-size: 10px;
-    color: #cee3ce;
-    opacity: 0.90;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-bottom: 2.5px;
-}
-#deviceSelect {
-    border: 1.2px solid #23a94b58;
-    background: rgba(30,40,30,0.21);
-    color: #fff;
-    border-radius: 6px;
-    width: 100%;
-    font-size: 10.5px;
-    padding: 3.5px 3px;
-    outline: none;
-    margin-bottom: 0;
-    margin-top: 1.5px;
-}
-#deviceSelect option:disabled {
-    opacity: .65; color: #acffcf;
+.prominent {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: .07em;
+    color: #d0ffd4;
+    text-shadow: 0 1px 8px #14391560;
+    margin-bottom: .5px;
 }
 .about-tiny {
-    font-size: 9.3px;
-    color: #d6fff2;
-    opacity: 0.80;
+    font-size: 7.5px;
+    color: #b7e7cb;
+    opacity: 0.72;
     text-align: left;
-    padding-top: 4px;
-    line-height: 1.22;
+    padding-top: 2.5px;
+    line-height: 1.13;
     margin-left: 1px;
     margin-bottom: 0;
+    font-style: italic;
 }
-.player-controls {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    padding: 10px 0 2px 0;
-}
-.control-btn {
-    background: rgba(55,255,110,0.13);
-    border: none;
-    border-radius: 17px;
-    color: white;
-    width: 39px;
-    height: 39px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background 0.18s, transform 0.13s;
-}
-.control-btn svg {
-    width: 22px;
-    height: 22px;
-    display: block;
-    pointer-events: none;
-}
-.control-btn.primary {
-    background: #1db954;
-    color: #fff;
+.current-song-title {
+    font-size: 10.8px;
     font-weight: 600;
-}
-.control-btn:active, .control-btn:focus {
-    background: #25be635c;
-    outline: none;
-    transform: scale(1.07);
-}
-#loginSpotify {
-    margin-top: 0;
-    width: 100%;
-    border-radius: 7px;
-    font-size: 11.8px;
-    font-weight: bold;
-    background: #1db954;
-    color: #fff;
-    border: none;
-    padding: 10px 0;
-    cursor: pointer;
-    box-shadow: 0 1px 4px #1271301a;
-    align-self: flex-end;
-}
-.r1-status {
-    background: rgba(0,0,0,0.17);
-    border-radius: 6px;
-    padding: 2px 3px;
-    font-size: 9.6px;
-    min-height: 16px;
+    color: #e0ffe5;
+    opacity: 0.93;
     text-align: center;
-}
-.hardware-feedback {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0,0,0,0.91);
-    color: #baf2ce;
-    padding: 7px 12px;
-    border-radius: 8px;
-    font-size: 11px;
-    opacity: 0;
-    transition: opacity 0.18s;
-    pointer-events: none;
-    z-index: 200;
-}
-.hardware-feedback.show { opacity: 1; }
-.hardware-legend {
-    font-size: 8.5px;
-    color: #b3fabd;
-    opacity: .68;
-    text-align: center;
-    margin-top: 4.5px;
-    margin-bottom: 2.5px;
-    letter-spacing: 0.03em;
+    margin: 7px 0 1px 0;
+    letter-spacing: .03em;
+    min-height: 14px;
 }
