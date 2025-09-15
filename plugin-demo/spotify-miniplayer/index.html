@@ -11,115 +11,129 @@
       background: #181818; color: #fff;
       font-family: system-ui, sans-serif;
       overflow: hidden;
+      /* Verhindert jegliches Scrollen! */
     }
     #playerControls {
-      width: 240px; height: 230px;
+      width: 100%; height: 100%;
       display: flex; flex-direction: column;
-      align-items: center;
-      background: #181818;
-      border-radius: 13px;
-      padding: 0; margin:0;
-      box-sizing: border-box;
+      align-items: center; justify-content: flex-start;
+      background: #181818; padding: 0; margin:0;
     }
     #albumArt {
-      width: 64px; height: 64px;
-      margin: 10px auto 3px auto;
-      border-radius: 10px;
-      box-shadow: 0 0 8px #111;
-      background: #232323;
-      display: block;
+      width: 56px; height: 56px; margin: 11px auto 4px auto;
+      border-radius: 9px; box-shadow: 0 0 8px #111;
+      background: #232323; display: block;
     }
     .track-info {
-      text-align: center; width: 100%;
-      margin: 0 0 4px 0; min-height: 20px;
+      text-align: center; width: 95%;
+      margin: 0 0 3px 0; min-height: 17px;
     }
     #trackName {
-      font-size: 0.99rem; font-weight: bold;
-      margin-bottom: 1.5px; max-width: 90%;
-      white-space: nowrap; overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 0.93rem; font-weight: 600; color: #fff;
+      margin-bottom: 0.5px; max-width:95%;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     #artistName {
-      font-size: 0.89rem; color: #b3b3b3;
-      max-width: 90%; white-space: nowrap;
-      overflow: hidden; text-overflow: ellipsis;
+      font-size: 0.80rem; color: #b3b3b3;
+      max-width:95%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .controls {
-      display: flex; justify-content: center;
-      align-items: center; gap: 11px;
-      margin: 4px 0 7px 0;
-      width: 100%;
+      display: flex; justify-content: center; align-items: center;
+      gap: 7px; margin: 6px 0 4px 0; width: 100%;
     }
     .control-btn {
-      width: 34px; height: 34px; border-radius: 7px;
-      background: #232323; color: #fff; border: none;
-      font-size: 1.2rem; font-weight: 700; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; padding: 0;
-      transition: background 0.13s;
-    }
-    .control-btn:active { background: #1db954; color:#191414; }
-    #playPauseBtn {
-      width: 40px; height: 40px; border-radius: 10px;
-      background: #1db954; color: #191414;
-      font-size: 1.28rem; font-weight: 700; border: none;
+      width: 32px; height: 32px; border-radius: 8px; border: none;
+      background: #232323; color: #fff;
+      font-size: 1.15rem; font-weight: 700;
       display: flex; align-items: center; justify-content: center;
-      padding: 0; margin: 0 2px;
+      cursor: pointer; outline-offset: 1px; transition: background 0.13s;
+      padding: 0;
     }
-    #playPauseBtn:active { background: #1ed760; }
+    .control-btn:active, .control-btn:focus { background: #1db954; color:#191414; }
+    #playPauseBtn {
+      width: 38px; height: 38px; border-radius: 9px;
+      background: #1db954; color: #191414; border: none;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.24rem; font-weight: 700; padding: 0; margin: 0 1.5px;
+    }
+    #playPauseBtn:active, #playPauseBtn:focus { background: #1ed760; }
     #playIcon { font-size: 1em; display:inline; }
     #pauseIcon { display:none; }
     #pauseIcon svg { vertical-align: middle; }
     #status {
-      min-height: 14px; text-align: center; color: #88b;
-      font-size: 0.80rem; margin: 1.5px 0 0.5px 0; width:100%;
+      min-height: 12px; text-align: center; color: #88b;
+      font-size: 0.80rem; margin: 2px 0 2px 0; width:95%;
     }
     #playHint {
-      color:#1db954;text-align:center;font-size:0.80rem;margin:1.5px;
+      color:#1db954;text-align:center;font-size:0.77rem;margin:1px 0 0 0;width:95%;
     }
     #recentAlbums {
-      display: flex; gap: 11px; margin: 11px 0 4px 0; justify-content: center;
+      display: flex; gap: 6px;
+      margin: 10px 0 0 0; justify-content: center;
       width: 100%;
     }
     .recent-album {
       cursor: pointer; display: flex; flex-direction: column; align-items: center;
-      width: 54px;
+      width: 50px;
+      outline: none;
+    }
+    .recent-album:focus {
+      box-shadow: 0 0 0 2px #1db954 inset;
+      border-radius: 7px;
     }
     .recent-album img {
-      width: 44px; height: 44px; border-radius: 6px; background: #111;
+      width: 40px; height: 40px; border-radius: 5px; background: #111;
     }
     .recent-album span {
-      font-size: .76em; color: #aaa; width:54px;
+      font-size: .74em; color: #aaa; width:50px;
       overflow-x: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;
       text-align: center;
+      margin-top: 2px;
     }
   </style>
 </head>
 <body>
   <div id="loginSection" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-    <div class="login-hint" style="text-align:center;color:#b3b3b3;font-size:1em;padding:15px 3px;">
+    <div class="login-hint" style="text-align:center;color:#b3b3b3;font-size:1em;padding:13px 4px 0 4px;">
       <strong>Spotify Premium benötigt</strong><br>
       Verbinde dein Spotify-Konto, um Musik auf dem Rabbit R1 zu hören.
     </div>
-    <button id="loginBtn" style="width:92%;margin:14px 0 0 0;height:32px;border-radius:10px;background:#1db954;color:#191414;font-size:1em;font-weight:600;border:none;box-shadow:0 2px 8px #1db95423;">Mit Spotify verbinden</button>
+    <button id="loginBtn" style="width:90%;margin:13px 0 0 0;height:32px;border-radius:10px;background:#1db954;color:#191414;font-size:1em;font-weight:600;border:none;box-shadow:0 2px 8px #1db95423;">Mit Spotify verbinden</button>
   </div>
-  <div id="playerControls">
+  <div id="playerControls" style="display:none;">
     <img id="albumArt" src="" alt="Albumcover">
     <div class="track-info">
       <div id="trackName">No track selected</div>
       <div id="artistName"></div>
     </div>
     <div class="controls">
-      <button class="control-btn" id="prevBtn" title="Zurück">&#9198;</button>
-      <button class="control-btn" id="playPauseBtn" title="Play/Pause">
+      <button class="control-btn" id="prevBtn" title="Zurück" tabindex="0">&#9198;</button>
+      <button class="control-btn" id="playPauseBtn" title="Play/Pause" tabindex="0">
         <span id="playIcon">&#9654;</span>
         <span id="pauseIcon"><svg width="13" height="13" viewBox="0 0 13 13"><rect x="2" y="2" width="3" height="9" fill="#191414"/><rect x="8" y="2" width="3" height="9" fill="#191414"/></svg></span>
       </button>
-      <button class="control-btn" id="nextBtn" title="Weiter">&#9197;</button>
+      <button class="control-btn" id="nextBtn" title="Weiter" tabindex="0">&#9197;</button>
     </div>
     <div id="status"></div>
     <div id="playHint">➔ Song oder Play-Button antippen!</div>
-    <div id="recentAlbums"></div>
+    <div id="recentAlbums">
+      <!-- Hier werden die drei letzten Alben als Fokus-Elemente eingefügt -->
+    </div>
   </div>
   <script src="miniplayer.js"></script>
+  <script>
+    // Macht die Alben per Tabulator und Scrollrad anwählbar:
+    function enableRecentFocusability() {
+      document.querySelectorAll('.recent-album').forEach((el, ix) => {
+        el.setAttribute('tabindex', '0');
+        el.onkeydown = function(e) {
+          if (e.key === 'Enter' || e.key === ' ') this.click();
+        };
+      });
+    }
+    // Nach dem Anzeigen der Alben in miniplayer.js aufrufen:
+    // enableRecentFocusability();
+    window.enableRecentFocusability = enableRecentFocusability;
+  </script>
 </body>
 </html>
