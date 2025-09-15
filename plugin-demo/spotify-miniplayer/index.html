@@ -2,45 +2,66 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=240, height=282">
-    <title>Spotify Miniplayer - Rabbit R1</title>
-    <link rel="stylesheet" href="../spotify-miniplayer/style.css">
-    <link rel="stylesheet" href="miniplayer.css">
+    <title>spotify r1mote</title>
+    <meta name="viewport" content="width=240,initial-scale=1,user-scalable=no">
+    <meta name="description" content="Spotify Connect Fernbedienung für Rabbit R1">
+    <link rel="stylesheet" href="style.css">
+    <!-- Spotify Web Playback SDK, falls im Browser nötig -->
     <script src="https://sdk.scdn.co/spotify-player.js"></script>
 </head>
 <body>
     <div class="r1-app-container">
         <div class="miniplayer-container">
-            <!-- Aktueller Track -->
+
             <div class="current-track" id="currentTrack">
                 <div class="track-artwork" id="trackArtwork">
-                    <img src="BlankCoverArt.png" width="120" height="120" alt="Album Art" id="albumArt">
+                    <!-- Cover-Placeholder (immer sichtbar) -->
+                    <img src="BlankCoverArt.png" alt="Album Art" id="albumArt" width="48" height="48">
                 </div>
                 <div class="track-info">
                     <div class="track-title" id="trackTitle">Kein Track ausgewählt</div>
-                    <div class="track-artist" id="trackArtist">Spotify Miniplayer</div>
+                    <div class="track-artist" id="trackArtist">spotify r1mote</div>
+                    <select id="deviceSelect" style="width:100%;margin-top:6px;border-radius:6px;font-size:11px;padding:3px 0;"></select>
                 </div>
             </div>
-            <!-- Controls -->
+
             <div class="player-controls">
-                <button class="control-btn" id="prevBtn" tabindex="0">⏮</button>
-                <button class="control-btn primary" id="playBtn" tabindex="0">▶</button>
-                <button class="control-btn" id="nextBtn" tabindex="0">⏭</button>
+                <button class="control-btn" id="prevBtn" title="Vorheriges Gerät (⏮️ oder Album)"><span>⏮️</span></button>
+                <button class="control-btn primary" id="playBtn" title="Play/Pause"><span>▶️</span></button>
+                <button class="control-btn" id="nextBtn" title="Nächstes Gerät (⏭️ oder Album)"><span>⏭️</span></button>
             </div>
-            <!-- Recent Albums - Scrollbar Navigation -->
-            <div class="recent-albums" id="recentAlbums">
-                <div class="albums-header">Kürzlich gespielt</div>
-                <div class="albums-grid" id="albumsGrid">
-                    <!-- Wird dynamisch befüllt -->
-                </div>
-            </div>
-            <!-- R1 Hardware Status -->
-            <div class="r1-status" id="r1Status">
-                <span class="status-text">◦ Scroll: Album auswählen | Side: Play/Pause</span>
-            </div>
-            <button id="loginSpotify" style="margin:12px auto;display:none;">Spotify Login</button>
+
+            <!-- Rückmeldungen für Hardware/Status -->
+            <div id="r1Status" class="r1-status" style="margin-top:4px;text-align:center;"></div>
+
+            <button id="loginSpotify" style="margin-top:11px;display:none;width:100%;border-radius:6px;padding:8px 0;font-size:12px;font-weight:bold;background:#1db954;color:#fff;cursor:pointer;">
+                Bei Spotify einloggen
+            </button>
+
+        </div>
+        <div style="font-size:9px;text-align:center;margin:5px 0 1px 0;opacity:.7;">
+            ◦ Scroll-/Hardwarewheel: Device wechseln | Play/Pause: seitlicher Button
         </div>
     </div>
+    
+    <!-- Feedback für User-Aktionen -->
+    <style>
+        .hardware-feedback {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 7px 12px;
+            border-radius: 7px;
+            font-size: 11px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        .hardware-feedback.show { opacity: 1; }
+    </style>
     <script src="miniplayer.js"></script>
 </body>
 </html>
