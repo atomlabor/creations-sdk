@@ -3,14 +3,12 @@
 const SPOTIFY_CLIENT_ID = '38d152037c7f4c5fa831171423f56e4b';
 const SPOTIFY_REDIRECT_URI = 'https://atomlabor.github.io/creations-sdk/plugin-demo/spotify-miniplayer/';
 const SPOTIFY_SCOPES = "streaming user-read-email user-read-private user-modify-playback-state user-read-playback-state playlist-read-private";
-
 // === GLOBAL STATE ===
 let spotifyPlayer = null;
 let currentDeviceId = null;
 let isPlaying = false;
 let currentTrack = null;
 let userInteractionDetected = false; // Track whether user has interacted
-
 // === PKCE HELPER FUNCTIONS ===
 function generateRandomString(length) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -20,7 +18,6 @@ function generateRandomString(length) {
   }
   return result;
 }
-
 async function generateCodeChallenge(verifier) {
   const data = new TextEncoder().encode(verifier);
   const hash = await window.crypto.subtle.digest('SHA-256', data);
@@ -29,35 +26,29 @@ async function generateCodeChallenge(verifier) {
     .replace(/\//g, '_')
     .replace(/=+$/, '');
 }
-
 // === UI HELPER FUNCTIONS ===
 function setStatus(msg) {
   const statusEl = document.getElementById('status');
   if (statusEl) statusEl.textContent = msg;
   console.log('Status:', msg);
 }
-
 function showLoginBtn(msg = "") {
   const loginBtn = document.getElementById('loginBtn');
   if (loginBtn) loginBtn.style.display = "block";
   if (msg) setStatus(msg);
 }
-
 function hideLoginBtn() {
   const loginBtn = document.getElementById('loginBtn');
   if (loginBtn) loginBtn.style.display = "none";
 }
-
 function showPlayer() {
   const playerControls = document.getElementById('playerControls');
   if (playerControls) playerControls.style.display = "block";
 }
-
 function hidePlayer() {
   const playerControls = document.getElementById('playerControls');
   if (playerControls) playerControls.style.display = "none";
 }
-
 function updateTrackInfo(track) {
   const trackName = document.getElementById('trackName');
   const artistName = document.getElementById('artistName');
@@ -76,7 +67,6 @@ function updateTrackInfo(track) {
     if (albumArt) albumArt.style.display = 'none';
   }
 }
-
 function updatePlayButton() {
   const playBtn = document.getElementById('playPauseBtn');
   if (playBtn) {
@@ -84,7 +74,6 @@ function updatePlayButton() {
     playBtn.title = isPlaying ? 'Pause' : 'Play';
   }
 }
-
 // === LOGIN FLOW ===
 window.doLoginFlow = async function() {
   try {
@@ -108,7 +97,6 @@ window.doLoginFlow = async function() {
     setStatus("Login preparation failed.");
   }
 };
-
 // === REDIRECT CALLBACK HANDLER ===
 function handleRedirectCallback() {
   if (window.location.search.includes('code=')) {
@@ -140,7 +128,9 @@ function handleRedirectCallback() {
         localStorage.removeItem('spotify_code_verifier');
         window.history.replaceState({}, document.title, SPOTIFY_REDIRECT_URI);
         setStatus("Login successful. Initializing player...");
+        // Rabbit R1 Anpassung: Player sofort nach Login anzeigen
         hideLoginBtn();
+        showPlayer();
         initSpotifyPlayer();
       } else {
         console.error('Token exchange failed:', data);
@@ -158,7 +148,6 @@ function handleRedirectCallback() {
   }
   return false;
 }
-
 // === DEVICE ACTIVATION ===
 function transferPlaybackHere(device_id, token) {
   fetch('https://api.spotify.com/v1/me/player', {
@@ -183,7 +172,6 @@ function transferPlaybackHere(device_id, token) {
     console.error('Device activation error:', error);
   });
 }
-
 // === SPOTIFY PLAYER INITIALIZATION ===
 function initSpotifyPlayer() {
   const token = localStorage.getItem('spotify_access_token');
@@ -216,7 +204,6 @@ function initSpotifyPlayer() {
       // Rabbit R1 Workaround: Add delay before transferPlaybackHere
       setTimeout(() => {
         transferPlaybackHere(device_id, token);
-        showPlayer();
         setStatus("Ready to play!");
       }, 1200); // 1.2 second delay
     });
@@ -268,7 +255,6 @@ function initSpotifyPlayer() {
     spotifyPlayer.connect();
   };
 }
-
 // === PLAYER CONTROLS ===
 window.togglePlayback = function() {
   // Only allow play/pause if user has explicitly interacted with the button
@@ -285,7 +271,6 @@ window.togglePlayback = function() {
     console.error('Error toggling playback:', error);
   });
 };
-
 window.nextTrack = function() {
   if (!spotifyPlayer) return;
   
@@ -295,7 +280,6 @@ window.nextTrack = function() {
     console.error('Error skipping track:', error);
   });
 };
-
 window.previousTrack = function() {
   if (!spotifyPlayer) return;
   
@@ -305,7 +289,6 @@ window.previousTrack = function() {
     console.error('Error going to previous track:', error);
   });
 };
-
 // === INITIALIZATION ===
 document.addEventListener('DOMContentLoaded', function() {
   // Bind login button
@@ -327,25 +310,24 @@ document.addEventListener('DOMContentLoaded', function() {
   const prevBtn = document.getElementById('prevBtn');
   if (prevBtn) prevBtn.onclick = window.previousTrack;
   
-  // Initialize app
+  // Initialize app - Rabbit R1: direkter Aufruf ohne Verzweigung
   if (!handleRedirectCallback()) {
     const token = localStorage.getItem('spotify_access_token');
     if (token) {
       hideLoginBtn();
+      showPlayer();
       initSpotifyPlayer();
     } else {
       showLoginBtn("Sign in with your Spotify Premium account.");
     }
   }
 });
-
 // === CLEANUP ===
 window.addEventListener('beforeunload', function() {
   if (spotifyPlayer) {
     spotifyPlayer.disconnect();
   }
 });
-
 /*
  * SECURITY NOTES:
  * - CLIENT_ID und REDIRECT_URI sind KEINE geheimen Userdaten!
@@ -357,4 +339,5 @@ window.addEventListener('beforeunload', function() {
  * - Added 1200ms delay after player ready event before device activation
  * - Play/Pause only triggers after explicit user button click (no autoplay)
  * - userInteractionDetected flag prevents unwanted playback triggers
+ * - Player sofort nach Login sichtbar (UI optimiert)
  */
