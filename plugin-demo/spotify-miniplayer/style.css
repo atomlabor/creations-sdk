@@ -1,0 +1,201 @@
+/* Rabbit R1 Miniplayer Styles */
+.r1-app-container {
+    width: 240px;
+    height: 282px;
+    background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+    border-radius: 12px;
+    padding: 8px;
+    box-sizing: border-box;
+    font-family: 'SF Pro Display', -apple-system, sans-serif;
+    color: white;
+    overflow: hidden;
+}
+
+.miniplayer-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.current-track {
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 60px;
+}
+
+.track-artwork img {
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+.track-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.track-title {
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+}
+
+.track-artist {
+    font-size: 9px;
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.player-controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 4px 0;
+}
+
+.control-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    border-radius: 20px;
+    color: white;
+    font-size: 14px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.control-btn:hover,
+.control-btn:focus {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.1);
+    outline: none;
+}
+
+.control-btn.primary {
+    background: rgba(255,255,255,0.9);
+    color: #1db954;
+    font-weight: bold;
+}
+
+.recent-albums {
+    flex: 1;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    padding: 6px;
+    overflow: hidden;
+}
+
+.albums-header {
+    font-size: 9px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    opacity: 0.9;
+}
+
+.albums-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 90px;
+    overflow-y: auto;
+}
+
+.album-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    font-size: 8px;
+}
+
+.album-item:hover,
+.album-item:focus {
+    background: rgba(255,255,255,0.1);
+    outline: none;
+}
+
+.album-item.focused {
+    background: rgba(255,255,255,0.2);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.3);
+}
+
+.album-item img {
+    width: 24px;
+    height: 24px;
+    border-radius: 3px;
+    object-fit: cover;
+}
+
+.album-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.album-title {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+.album-artist {
+    opacity: 0.7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 7px;
+    line-height: 1.1;
+}
+
+.r1-status {
+    background: rgba(0,0,0,0.4);
+    border-radius: 6px;
+    padding: 3px 6px;
+    text-align: center;
+}
+
+.status-text {
+    font-size: 7px;
+    opacity: 0.8;
+    font-weight: 400;
+}
+
+/* R1 Hardware Feedback */
+.hardware-feedback {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 100;
+}
+
+.hardware-feedback.show {
+    opacity: 1;
+}
