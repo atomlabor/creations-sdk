@@ -1,139 +1,74 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=240, height=230, initial-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=240, height=282, initial-scale=1.0, user-scalable=no">
   <title>Rabbit R1 Spotify Miniplayer</title>
-  <style>
-    html, body {
-      width: 240px; height: 230px;
-      margin: 0; padding: 0;
-      background: #181818; color: #fff;
-      font-family: system-ui, sans-serif;
-      overflow: hidden;
-      /* Verhindert jegliches Scrollen! */
-    }
-    #playerControls {
-      width: 100%; height: 100%;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: flex-start;
-      background: #181818; padding: 0; margin:0;
-    }
-    #albumArt {
-      width: 56px; height: 56px; margin: 11px auto 4px auto;
-      border-radius: 9px; box-shadow: 0 0 8px #111;
-      background: #232323; display: block;
-    }
-    .track-info {
-      text-align: center; width: 95%;
-      margin: 0 0 3px 0; min-height: 17px;
-    }
-    #trackName {
-      font-size: 0.93rem; font-weight: 600; color: #fff;
-      margin-bottom: 0.5px; max-width:95%;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    #artistName {
-      font-size: 0.80rem; color: #b3b3b3;
-      max-width:95%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .controls {
-      display: flex; justify-content: center; align-items: center;
-      gap: 7px; margin: 6px 0 4px 0; width: 100%;
-    }
-    .control-btn {
-      width: 32px; height: 32px; border-radius: 8px; border: none;
-      background: #232323; color: #fff;
-      font-size: 1.15rem; font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; outline-offset: 1px; transition: background 0.13s;
-      padding: 0;
-    }
-    .control-btn:active, .control-btn:focus { background: #1db954; color:#191414; }
-    #playPauseBtn {
-      width: 38px; height: 38px; border-radius: 9px;
-      background: #1db954; color: #191414; border: none;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.24rem; font-weight: 700; padding: 0; margin: 0 1.5px;
-    }
-    #playPauseBtn:active, #playPauseBtn:focus { background: #1ed760; }
-    #playIcon { font-size: 1em; display:inline; }
-    #pauseIcon { display:none; }
-    #pauseIcon svg { vertical-align: middle; }
-    #status {
-      min-height: 12px; text-align: center; color: #88b;
-      font-size: 0.80rem; margin: 2px 0 2px 0; width:95%;
-    }
-    #playHint {
-      color:#1db954;text-align:center;font-size:0.77rem;margin:1px 0 0 0;width:95%;
-    }
-    #recentAlbums {
-      display: flex; gap: 6px;
-      margin: 10px 0 0 0; justify-content: center;
-      width: 100%;
-    }
-    .recent-album {
-      cursor: pointer; display: flex; flex-direction: column; align-items: center;
-      width: 50px;
-      outline: none;
-    }
-    .recent-album:focus {
-      box-shadow: 0 0 0 2px #1db954 inset;
-      border-radius: 7px;
-    }
-    .recent-album img {
-      width: 40px; height: 40px; border-radius: 5px; background: #111;
-    }
-    .recent-album span {
-      font-size: .74em; color: #aaa; width:50px;
-      overflow-x: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;
-      text-align: center;
-      margin-top: 2px;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="loginSection" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-    <div class="login-hint" style="text-align:center;color:#b3b3b3;font-size:1em;padding:13px 4px 0 4px;">
-      <strong>Spotify Premium benötigt</strong><br>
-      Verbinde dein Spotify-Konto, um Musik auf dem Rabbit R1 zu hören.
-    </div>
-    <button id="loginBtn" style="width:90%;margin:13px 0 0 0;height:32px;border-radius:10px;background:#1db954;color:#191414;font-size:1em;font-weight:600;border:none;box-shadow:0 2px 8px #1db95423;">Mit Spotify verbinden</button>
+  <!-- Rabbit R1 Hardware Indicator -->
+  <div id="hardwareIndicator" class="r1-hardware-indicator" aria-live="polite">
+    <span id="hardwareStatus">🎵 Rabbit R1 Ready</span>
   </div>
-  <div id="playerControls" style="display:none;">
-    <img id="albumArt" src="" alt="Albumcover">
-    <div class="track-info">
-      <div id="trackName">No track selected</div>
-      <div id="artistName"></div>
-    </div>
-    <div class="controls">
-      <button class="control-btn" id="prevBtn" title="Zurück" tabindex="0">&#9198;</button>
-      <button class="control-btn" id="playPauseBtn" title="Play/Pause" tabindex="0">
-        <span id="playIcon">&#9654;</span>
-        <span id="pauseIcon"><svg width="13" height="13" viewBox="0 0 13 13"><rect x="2" y="2" width="3" height="9" fill="#191414"/><rect x="8" y="2" width="3" height="9" fill="#191414"/></svg></span>
+
+  <!-- Login Section -->
+  <div id="loginSection" class="r1-login-section">
+    <div class="r1-login-content">
+      <div class="r1-logo">🎵</div>
+      <h2 class="r1-title">Spotify Premium</h2>
+      <p class="r1-subtitle">Verbinde dein Spotify-Konto für Musikwiedergabe</p>
+      <button id="loginBtn" class="r1-primary-btn r1-focusable" tabindex="0" 
+              data-r1-action="login" aria-label="Mit Spotify verbinden">
+        Mit Spotify verbinden
       </button>
-      <button class="control-btn" id="nextBtn" title="Weiter" tabindex="0">&#9197;</button>
-    </div>
-    <div id="status"></div>
-    <div id="playHint">➔ Song oder Play-Button antippen!</div>
-    <div id="recentAlbums">
-      <!-- Hier werden die drei letzten Alben als Fokus-Elemente eingefügt -->
     </div>
   </div>
+
+  <!-- Player Controls -->
+  <div id="playerControls" class="r1-player-container" style="display:none;">
+    <!-- Album Art -->
+    <div class="r1-album-section">
+      <img id="albumArt" class="r1-album-art r1-focusable" tabindex="0" 
+           alt="Albumcover" data-r1-action="toggle-play" 
+           src="" aria-label="Aktueller Song - Zum Abspielen antippen">
+    </div>
+
+    <!-- Track Info -->
+    <div class="r1-track-info">
+      <div id="trackName" class="r1-track-title" aria-live="polite">Kein Song ausgewählt</div>
+      <div id="artistName" class="r1-track-artist" aria-live="polite"></div>
+    </div>
+
+    <!-- Main Controls -->
+    <div class="r1-controls-main">
+      <button id="prevBtn" class="r1-control-btn r1-focusable" tabindex="0" 
+              data-r1-action="previous" aria-label="Vorheriger Song">
+        <span class="r1-icon">⏮</span>
+      </button>
+      
+      <button id="playPauseBtn" class="r1-play-btn r1-focusable" tabindex="0" 
+              data-r1-action="play-pause" aria-label="Abspielen/Pausieren">
+        <span id="playIcon" class="r1-play-icon">▶</span>
+        <span id="pauseIcon" class="r1-pause-icon" style="display:none;">⏸</span>
+      </button>
+      
+      <button id="nextBtn" class="r1-control-btn r1-focusable" tabindex="0" 
+              data-r1-action="next" aria-label="Nächster Song">
+        <span class="r1-icon">⏭</span>
+      </button>
+    </div>
+
+    <!-- Status Display -->
+    <div id="status" class="r1-status" aria-live="polite"></div>
+    <div id="playHint" class="r1-play-hint">➔ Song oder Play-Button antippen!</div>
+
+    <!-- Recent Albums -->
+    <div id="recentAlbums" class="r1-recent-albums">
+      <!-- Dynamically populated recent albums with r1-focusable class -->
+    </div>
+  </div>
+
   <script src="miniplayer.js"></script>
-  <script>
-    // Macht die Alben per Tabulator und Scrollrad anwählbar:
-    function enableRecentFocusability() {
-      document.querySelectorAll('.recent-album').forEach((el, ix) => {
-        el.setAttribute('tabindex', '0');
-        el.onkeydown = function(e) {
-          if (e.key === 'Enter' || e.key === ' ') this.click();
-        };
-      });
-    }
-    // Nach dem Anzeigen der Alben in miniplayer.js aufrufen:
-    // enableRecentFocusability();
-    window.enableRecentFocusability = enableRecentFocusability;
-  </script>
 </body>
 </html>
