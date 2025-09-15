@@ -40,6 +40,7 @@ function loginWithSpotify() {
       '&client_id=' + encodeURIComponent(clientId) +
       '&redirect_uri=' + encodeURIComponent(redirectUri) +
       '&scope=' + encodeURIComponent(scopes.join(' '));
+    console.log('Spotify Login URL:', url);
     window.location = url;
 }
 // --- SPOTIFY MINIPLAYER-CLASS ---
@@ -245,16 +246,5 @@ document.addEventListener('DOMContentLoaded', () => {
         new SpotifyMiniplayerR1(token);
     } else if(loginBtn) {
         loginBtn.style.display = "block";
-    }
-});
-
-// Debug-Code
-document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('loginSpotify');
-    if (btn) {
-        btn.onclick = () => {
-            alert("Test-Handler spricht an! Danach wird jetzt Spotify geöffnet.");
-            loginWithSpotify();
-        }
     }
 });
