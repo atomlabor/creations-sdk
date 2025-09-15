@@ -76,9 +76,7 @@ function updateTrackInfo(track) {
 function updatePlayButton() {
   const playBtn = document.getElementById('playPauseBtn');
   if (playBtn) {
-    // Keine Emojis, sondern Unicode/SVG
     playBtn.title = isPlaying ? 'Pause' : 'Play';
-    // Play/Pause-Handling (falls SVG Toggle notwendig)
     if (typeof updatePlayPauseIcon === 'function') updatePlayPauseIcon(isPlaying);
   }
 }
@@ -139,8 +137,8 @@ function handleRedirectCallback() {
         setupRabbitAlbumPlaylistUI();
         const playHint = document.getElementById('playHint');
         if (playHint) playHint.style.display = 'block';
+        fetchAndShowRecentAlbums(); // << NEU: Anzeige der drei letzten Alben!
       } else {
-        // Erweiterte Fehlerausgabe!
         console.error('Token exchange failed:', data);
         setStatus("Authorization failed: " + JSON.stringify(data));
         localStorage.removeItem("spotify_access_token");
@@ -148,7 +146,6 @@ function handleRedirectCallback() {
       }
     })
     .catch(error => {
-      // Erweiterte Fehlerausgabe auch im Catch!
       console.error('Token exchange error:', error);
       setStatus("Authorization error: " + error);
       localStorage.removeItem("spotify_access_token");
@@ -201,7 +198,7 @@ function initSpotifyPlayer() {
         setStatus("Bereit zum Abspielen!");
         const playHint = document.getElementById('playHint');
         if (playHint) playHint.style.display = 'block';
-      }, 1300); // Wartezeit wichtig
+      }, 1300);
     });
     spotifyPlayer.addListener('not_ready', ({ device_id }) => {
       setStatus("Player not ready.");
@@ -309,6 +306,55 @@ async function playTrackURI(uri) {
   if(hint) hint.style.display = 'none';
 }
 
+// === NEU! Holt und zeigt die drei zuletzt gehörten Alben als Cover, klickbar zum Abspielen ===
+async function fetchAndShowRecentAlbums() {
+  const token = localStorage.getItem('spotify_access_token');
+  if (!token) return;
+  try {
+    let resp = await fetch('https://api.spotify.com/v1/me/player/recently-played?limit=20',{
+      headers:{'Authorization':'Bearer '+token}});
+    let data = await resp.json();
+    let albums = [];
+    let seen = {};
+    data.items.forEach(item => {
+      const album = item.track.album;
+      if (album && !seen[album.id]) {
+        albums.push(album);
+        seen[album.id] = true;
+      }
+    });
+    albums = albums.slice(0,3);
+    const ra = document.getElementById('recentAlbums');
+    if (!ra) return;
+    ra.innerHTML =
+      albums.map(a => `
+        <div class="recent-album" data-uri="${a.uri}" style="cursor:pointer;display:flex;flex-direction:column;align-items:center;width:54px">
+          <img src="${a.images[0]?.url||''}" style="width:44px;height:44px;border-radius:6px;background:#111;">
+          <span style="font-size:.76em;color:#aaa;width:54px;overflow-x:hidden;text-overflow:ellipsis;white-space:nowrap;display:block">${a.name}</span>
+        </div>
+      `).join('');
+    document.querySelectorAll(".recent-album").forEach(el => {
+      el.onclick = function() {
+        playAlbum(this.getAttribute('data-uri'));
+      }
+    });
+  } catch (err) {
+    const ra = document.getElementById('recentAlbums');
+    if(ra) ra.innerHTML = '';
+  }
+}
+
+// Zum Abspielen eines Albums per URI (für das Klicken auf das Cover)
+function playAlbum(albumUri) {
+  const token = localStorage.getItem('spotify_access_token');
+  if (!token) return;
+  fetch('https://api.spotify.com/v1/me/player/play', {
+    method: 'PUT',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ context_uri: albumUri })
+  });
+}
+
 // === TOUCH- & INIT EVENT BINDINGS ===
 document.addEventListener('DOMContentLoaded', function() {
   const loginBtn = document.getElementById('loginBtn');
@@ -333,11 +379,13 @@ document.addEventListener('DOMContentLoaded', function() {
       setupRabbitAlbumPlaylistUI();
       const playHint = document.getElementById('playHint');
       if (playHint) playHint.style.display = 'block';
+      fetchAndShowRecentAlbums(); // <<< NEU: Letzte Alben beim Reload anzeigen!
     } else {
       showLoginBtn("Sign in with your Spotify Premium account.");
     }
   }
 });
+
 async function setupRabbitAlbumPlaylistUI() {
   await populatePlaylists();
   await populateAlbums();
