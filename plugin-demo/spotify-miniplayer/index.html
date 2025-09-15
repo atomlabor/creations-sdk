@@ -1,177 +1,125 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=240, height=230, initial-scale=1.0, user-scalable=no">
   <title>Rabbit R1 Spotify Miniplayer</title>
   <style>
     html, body {
-      width: 100vw;
-      height: 100vh;
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      background: #000;
-      color: #fff;
+      width: 240px; height: 230px;
+      margin: 0; padding: 0;
+      background: #181818; color: #fff;
       font-family: system-ui, sans-serif;
       overflow: hidden;
     }
-    
-    #app {
-      width: 200px;
-      height: 140px;
-      position: absolute;
-      top: 0;
-      left: 0;
-      display: flex;
-      flex-direction: column;
+    #playerControls {
+      width: 240px; height: 230px;
+      display: flex; flex-direction: column;
+      align-items: center;
       background: #181818;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      border-radius: 13px;
+      padding: 0; margin:0;
+      box-sizing: border-box;
     }
-    
-    header {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 4px;
-      font-size: 10px;
-      font-weight: bold;
-      background: rgba(255,255,255,0.1);
-      border-radius: 8px 8px 0 0;
+    #albumArt {
+      width: 64px; height: 64px;
+      margin: 10px auto 3px auto;
+      border-radius: 10px;
+      box-shadow: 0 0 8px #111;
+      background: #232323;
+      display: block;
     }
-    
-    .player-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 6px;
-    }
-    
     .track-info {
-      text-align: center;
+      text-align: center; width: 100%;
+      margin: 0 0 4px 0; min-height: 20px;
     }
-    
-    .track-title {
-      font-size: 10px;
-      font-weight: bold;
-      margin-bottom: 2px;
-      white-space: nowrap;
-      overflow: hidden;
+    #trackName {
+      font-size: 0.99rem; font-weight: bold;
+      margin-bottom: 1.5px; max-width: 90%;
+      white-space: nowrap; overflow: hidden;
       text-overflow: ellipsis;
     }
-    
-    .track-artist {
-      font-size: 8px;
-      color: #b3b3b3;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    #artistName {
+      font-size: 0.89rem; color: #b3b3b3;
+      max-width: 90%; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
     }
-    
     .controls {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      margin: 4px 0;
+      display: flex; justify-content: center;
+      align-items: center; gap: 11px;
+      margin: 4px 0 7px 0;
+      width: 100%;
     }
-    
     .control-btn {
-      background: none;
-      border: none;
-      color: #fff;
-      font-size: 12px;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background 0.2s;
+      width: 34px; height: 34px; border-radius: 7px;
+      background: #232323; color: #fff; border: none;
+      font-size: 1.2rem; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; padding: 0;
+      transition: background 0.13s;
     }
-    
-    .control-btn:hover {
-      background: rgba(255,255,255,0.1);
+    .control-btn:active { background: #1db954; color:#191414; }
+    #playPauseBtn {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: #1db954; color: #191414;
+      font-size: 1.28rem; font-weight: 700; border: none;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0; margin: 0 2px;
     }
-    
-    .play-btn {
-      font-size: 14px;
-      width: 24px;
-      height: 24px;
+    #playPauseBtn:active { background: #1ed760; }
+    #playIcon { font-size: 1em; display:inline; }
+    #pauseIcon { display:none; }
+    #pauseIcon svg { vertical-align: middle; }
+    #status {
+      min-height: 14px; text-align: center; color: #88b;
+      font-size: 0.80rem; margin: 1.5px 0 0.5px 0; width:100%;
     }
-    
-    .timeline {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 8px;
+    #playHint {
+      color:#1db954;text-align:center;font-size:0.80rem;margin:1.5px;
     }
-    
-    .progress-bar {
-      flex: 1;
-      height: 2px;
-      background: #404040;
-      border-radius: 1px;
-      position: relative;
-      cursor: pointer;
-    }
-    
-    .progress-fill {
-      height: 100%;
-      background: #1db954;
-      border-radius: 1px;
-      width: 30%;
-    }
-    
     #recentAlbums {
-      display: flex;
-      gap: 8px;
-      margin: 8px 0 4px 0;
-      justify-content: center;
+      display: flex; gap: 11px; margin: 11px 0 4px 0; justify-content: center;
+      width: 100%;
     }
-    
-    .album-cover {
-      width: 24px;
-      height: 24px;
-      border-radius: 2px;
-      cursor: pointer;
-      transition: opacity 0.2s;
+    .recent-album {
+      cursor: pointer; display: flex; flex-direction: column; align-items: center;
+      width: 54px;
     }
-    
-    .album-cover:hover {
-      opacity: 0.8;
+    .recent-album img {
+      width: 44px; height: 44px; border-radius: 6px; background: #111;
+    }
+    .recent-album span {
+      font-size: .76em; color: #aaa; width:54px;
+      overflow-x: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <div id="app">
-    <header>
-      Spotify Miniplayer
-    </header>
-    <div class="player-content">
-      <div class="track-info">
-        <div class="track-title">Song Title</div>
-        <div class="track-artist">Artist Name</div>
-      </div>
-      <div class="controls">
-        <button class="control-btn">⏮</button>
-        <button class="control-btn play-btn">▶</button>
-        <button class="control-btn">⏭</button>
-      </div>
-      <div class="timeline">
-<div id="recentAlbums" style="display:flex;gap:8px;margin:8px 0 4px 0;justify-content:center;"></div>
-        <div class="progress-bar">
-          <div class="progress-fill"></div>
-        </div>
-      </div>
-      <div id="recentAlbums" style="display:flex;gap:8px;margin:8px 0 4px 0;justify-content:center;"></div>
+  <div id="loginSection" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+    <div class="login-hint" style="text-align:center;color:#b3b3b3;font-size:1em;padding:15px 3px;">
+      <strong>Spotify Premium benötigt</strong><br>
+      Verbinde dein Spotify-Konto, um Musik auf dem Rabbit R1 zu hören.
     </div>
+    <button id="loginBtn" style="width:92%;margin:14px 0 0 0;height:32px;border-radius:10px;background:#1db954;color:#191414;font-size:1em;font-weight:600;border:none;box-shadow:0 2px 8px #1db95423;">Mit Spotify verbinden</button>
   </div>
-  
+  <div id="playerControls">
+    <img id="albumArt" src="" alt="Albumcover">
+    <div class="track-info">
+      <div id="trackName">No track selected</div>
+      <div id="artistName"></div>
+    </div>
+    <div class="controls">
+      <button class="control-btn" id="prevBtn" title="Zurück">&#9198;</button>
+      <button class="control-btn" id="playPauseBtn" title="Play/Pause">
+        <span id="playIcon">&#9654;</span>
+        <span id="pauseIcon"><svg width="13" height="13" viewBox="0 0 13 13"><rect x="2" y="2" width="3" height="9" fill="#191414"/><rect x="8" y="2" width="3" height="9" fill="#191414"/></svg></span>
+      </button>
+      <button class="control-btn" id="nextBtn" title="Weiter">&#9197;</button>
+    </div>
+    <div id="status"></div>
+    <div id="playHint">➔ Song oder Play-Button antippen!</div>
+    <div id="recentAlbums"></div>
+  </div>
   <script src="miniplayer.js"></script>
-  <script>fetchAndShowRecentAlbums();</script>
 </body>
 </html>
