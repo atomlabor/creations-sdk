@@ -1,6 +1,6 @@
 // --- Spotify Auth/Token-Utility ---
 const SPOTIFY_CLIENT_ID = 'f28477d2f23444739d1f6911c1d6be9d';
-const SPOTIFY_REDIRECT_URI = 'https://atomlabor.github.io/rabbit-spotify-miniplayer/';
+const SPOTIFY_REDIRECT_URI = 'https://atomlabor.github.io/rabbit-r1-apps/plugin-demo/spotify-miniplayer/';
 const SPOTIFY_SCOPES = [
     'user-read-playback-state',
     'user-modify-playback-state',
