@@ -152,6 +152,9 @@
       margin-bottom: 2px;
       width:100%;
     }
+    #playHint {
+      color:#1db954;text-align:center;font-size:0.94rem;margin:4px;
+    }
   </style>
 </head>
 <body>
@@ -169,9 +172,9 @@
       <div id="artistName"></div>
     </div>
     <div class="controls">
-      <button class="control-btn" id="prevBtn" title="Zurück">&#9198;</button>
+      <button class="control-btn" id="prevBtn" title="Zurück">⏮</button>
       <button class="control-btn" id="playPauseBtn" title="Play">►</button>
-      <button class="control-btn" id="nextBtn" title="Weiter">&#9197;</button>
+      <button class="control-btn" id="nextBtn" title="Weiter">⏭</button>
     </div>
     <div id="selectionPanel">
       <input id="playlistFilter" type="search" placeholder="Playlist suchen…"/>
@@ -181,6 +184,7 @@
     </div>
     <ul id="trackList"></ul>
     <div id="status"></div>
+    <div id="playHint">➔ Bitte tippe einen Track an oder nutze ►, um die Musik dauerhaft zu starten!</div>
   </div>
   <script src="miniplayer.js"></script>
 </body>
