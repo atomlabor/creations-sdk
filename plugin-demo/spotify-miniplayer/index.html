@@ -14,9 +14,9 @@
       width: 240px; height: 282px;
       box-sizing: border-box;
       background: #181818;
-      border-radius: 16px;
-      padding: 6px 4px 4px 4px;
-      display: none; /* Show after login */
+      border-radius: 15px;
+      padding: 4px 2px 2px 2px;
+      display: none;
       flex-direction: column;
       align-items: center;
       overflow: hidden;
@@ -27,133 +27,95 @@
       align-items: center; justify-content: center;
     }
     #loginBtn {
-      width: 90%; height: 48px; border-radius: 12px;
-      font-size: 1.07rem; font-weight: 600;
+      width: 90%; height: 36px; border-radius: 10px;
+      font-size: 1rem; font-weight: 600;
       background: #1db954; color: #191414;
-      border: none; margin: 18px auto 0 auto;
+      border: none; margin: 14px auto 0 auto;
       cursor: pointer; display: block;
-      box-shadow: 0 3px 9px #1db95444;
+      box-shadow: 0 3px 8px #1db95423;
       transition: background 0.12s;
     }
-    #loginBtn:active { background: #1ed760; }
     .login-hint {
-      text-align: center;
-      font-size: 1.02rem;
-      color: #b3b3b3;
-      padding: 15px 12px 0 12px;
-      line-height: 1.25;
+      text-align: center; font-size: 0.98rem;
+      color: #b3b3b3; padding: 11px 6px 0 6px;
+      line-height: 1.2;
     }
     #albumArt {
-      width: 80px;
-      height: 80px;
-      margin: 6px auto 3px auto;
-      border-radius: 10px;
-      display: block;
-      box-shadow: 0 0 8px #111;
-      background: #232323;
+      width: 60px; height: 60px;
+      margin: 2px auto 2px auto; border-radius: 9px;
+      display: block; box-shadow: 0 0 7px #111; background: #232323;
     }
     .track-info {
-      text-align: center;
-      width: 100%;
-      margin: 4px 0 4px 0;
+      text-align: center; width: 100%;
+      margin: 1px 0 2px 0; min-height: 29px;
     }
     #trackName {
-      font-size: 0.99rem;
-      font-weight: bold;
-      margin-bottom: 1.5px;
-      line-height: 1.1;
-      max-width: 94%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 0.92rem; font-weight: 600;
+      margin-bottom: 0.5px; max-width: 89%;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     #artistName {
-      font-size: 0.89rem;
-      color: #b3b3b3;
-      max-width: 94%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 0.78rem; color: #b3b3b3;
+      max-width: 89%; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
     }
     .controls {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 7px 0 5px 0;
-      gap: 8px;
-      width: 100%;
+      display: flex; justify-content: center; align-items: center;
+      gap: 6px; margin: 3px 0 2px 0; width: 100%;
     }
     .control-btn {
-      width: 38px; height: 38px;
-      border-radius: 10px;
-      background: #232323;
-      color: #fff;
-      border: none;
-      font-size: 1.17rem;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      outline: none;
-      transition: background 0.14s;
+      width: 22px; height: 22px; border-radius: 6px;
+      background: #232323; color: #fff; border: none;
+      font-size: 1rem; font-weight: 600;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; outline: none; transition: background 0.13s;
+      padding: 0;
     }
     .control-btn:active { background: #1db954; color:#191414; }
     #playPauseBtn {
+      width: 32px; height: 32px; border-radius: 8px;
       background: #1db954; color: #191414;
-      font-size: 1.15rem; font-weight: bold;
-      width: 44px; height: 44px; border-radius: 11px;
-      transition: background 0.14s;
+      font-size: 1.18rem; font-weight: 700; border: none;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0; margin: 0 2px;
     }
     #playPauseBtn:active { background: #1ed760; }
+    /* Symbolik */
+    .icon-bar { display: block; width: 13px; height: 13px; position: relative; margin: 0 auto;}
+    .icon-bar span {
+      position: absolute; display: block; background: #191414; left: 0; width: 5px; border-radius:2px;
+    }
+    .icon-bar .bar1 { top: 2px;  height: 9px;}
+    .icon-bar .bar2 { left: 8px; top: 2px; height: 9px;}
     #selectionPanel {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      margin-bottom: 4px; margin-top: 2px;
-      align-items: center;
+      width: 98%;
+      display: flex; flex-direction: column; gap: 1px;
+      margin-bottom: 0; margin-top: 1px; align-items: center;
     }
     #playlistFilter, #albumFilter, #playlistSelect, #albumSelect {
-      font-size: 0.92rem; padding: 2px 4px;
-      border-radius: 8px;
-      width: 98%;
-      background: #222;
-      color: #fff;
-      border: 1px solid #333;
-      margin-bottom: 1.5px; margin-top: 1.5px;
+      font-size: 0.85rem; padding: 1.5px 3px;
+      border-radius: 7px; width: 100%;
+      background: #222; color: #fff; border: 1px solid #333;
+      margin-bottom: 1px; margin-top: 1px;
     }
     #trackList {
-      list-style: none;
-      padding: 0; margin: 0 0 2px 0;
-      width: 100%;
-      max-height: 60px;
-      overflow-y: auto;
+      list-style: none; padding: 0; margin: 0 0 2px 0;
+      width: 99%; max-height: 30px; overflow-y: auto;
     }
     .touchListItem {
-      font-size: 0.94rem;
-      padding: 6px 4px;
-      margin-bottom: 1px;
-      border-radius: 7px;
-      background: #232323;
-      color: #fff;
-      cursor: pointer;
-      outline: none;
+      font-size: 0.81rem; padding: 4.5px 2px;
+      margin-bottom: 1px; border-radius: 4px; background: #232323;
+      color: #fff; cursor: pointer; outline: none;
     }
     .touchListItem:active, .touchListItem:focus {
       background: #1db954 !important; color: #191414;
     }
     #status {
-      min-height: 18px;
-      text-align: center;
-      color: #88b;
-      font-size: 0.89rem;
-      margin-top: 1px;
-      margin-bottom: 2px;
-      width:100%;
+      min-height: 13px; text-align: center; color: #88b;
+      font-size: 0.82rem; margin: 1.5px 0 1px 0; width:100%;
     }
     #playHint {
-      color:#1db954;text-align:center;font-size:0.94rem;margin:4px;
+      color:#1db954;text-align:center;font-size:0.80rem;margin:1.5px;
     }
   </style>
 </head>
@@ -172,20 +134,32 @@
       <div id="artistName"></div>
     </div>
     <div class="controls">
-      <button class="control-btn" id="prevBtn" title="Zurück">⏮</button>
-      <button class="control-btn" id="playPauseBtn" title="Play">►</button>
-      <button class="control-btn" id="nextBtn" title="Weiter">⏭</button>
+      <button class="control-btn" id="prevBtn" title="Zurück">&#9198;</button>
+      <button class="control-btn" id="playPauseBtn" title="Play">
+        <span id="playIcon">&#9654;</span>
+        <span id="pauseIcon" style="display:none;" class="icon-bar">
+          <span class="bar1" style="background:#191414;"></span>
+          <span class="bar2" style="background:#191414;"></span>
+        </span>
+      </button>
+      <button class="control-btn" id="nextBtn" title="Weiter">&#9197;</button>
     </div>
     <div id="selectionPanel">
-      <input id="playlistFilter" type="search" placeholder="Playlist suchen…"/>
       <select id="playlistSelect"></select>
-      <input id="albumFilter" type="search" placeholder="Album suchen…"/>
       <select id="albumSelect"></select>
     </div>
     <ul id="trackList"></ul>
     <div id="status"></div>
-    <div id="playHint">➔ Bitte tippe einen Track an oder nutze ►, um die Musik dauerhaft zu starten!</div>
+    <div id="playHint">➔ Bitte tippe einen Track an oder nutze den Play-Button, um dauerhaft Musik zu hören!</div>
   </div>
+  <script>
+    // Dynamisch Play/Pause-Icon umschalten (empfohlene Logik in deiner miniplayer.js):
+    function updatePlayPauseIcon(isPlaying) {
+      document.getElementById('playIcon').style.display = isPlaying ? 'none':'inline';
+      document.getElementById('pauseIcon').style.display = isPlaying ? 'inline':'none';
+    }
+    // Binde dies im JS im "player_state_changed" und nach Play/Pause an.
+  </script>
   <script src="miniplayer.js"></script>
 </body>
 </html>
