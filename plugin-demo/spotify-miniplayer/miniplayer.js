@@ -84,12 +84,13 @@ class SpotifyR1mote {
         this.trackArtist = document.getElementById('trackArtist');
         this.albumArt = document.getElementById('albumArt');
         this.loginBtn = document.getElementById('loginSpotify');
-        // Cover Placeholder
+        this.playIcon = document.getElementById('playIcon');
+        this.pauseIcon = document.getElementById('pauseIcon');
         if(this.albumArt) {
             this.albumArt.src = "BlankCoverArt.png";
             this.albumArt.alt = "No Album Art";
         }
-        this.trackTitle.textContent = "Kein Track ausgewählt";
+        this.trackTitle.textContent = "No track selected";
         this.trackArtist.textContent = "spotify r1mote";
         if (this.loginBtn) this.loginBtn.style.display = "none";
         if(this.playBtn) this.playBtn.addEventListener('click', () => this.togglePlayback());
@@ -98,7 +99,6 @@ class SpotifyR1mote {
         if(this.deviceSelect) this.deviceSelect.addEventListener('change', () => this.selectDevice(this.deviceSelect.selectedIndex));
     }
     setupHardwareListeners() {
-        // Rabbit R1 scrollwheel und Hardware-Events!
         window.addEventListener("scrollUp", () => {
             if (this.deviceList.length === 0) return;
             this.deviceIndex = Math.max(this.deviceIndex - 1, 0);
@@ -117,22 +117,22 @@ class SpotifyR1mote {
     }
     async updateDevices() {
         try {
-            const resp = await fetch('https://api.spotify.com/v1/me/devices', {
+            const resp = await fetch('https://api.spotify.com/v1/me/player/devices', {
                 headers: { 'Authorization': 'Bearer ' + this.token }
             });
             const json = await resp.json();
-            // KEIN Filter, ALLE Devices anzeigen
+            // Entsprechend Doku: ALLE Devices anzeigen!
             this.deviceList = (json.devices||[]);
             this.renderDeviceDropdown();
             if (this.deviceList.length > 0) {
                 this.selectDevice(this.deviceIndex);
             } else {
-                this.showHardwareFeedback('Keine Connect-Geräte verfügbar!');
-                this.deviceSelect.innerHTML = '<option disabled selected>Keine Spotify-Geräte gefunden!</option>';
+                this.showHardwareFeedback('No Spotify Connect devices found! Make sure your Spotify app is open.');
+                this.deviceSelect.innerHTML = '<option disabled selected>No Spotify Connect devices found.</option>';
             }
         } catch(e) {
-            this.showHardwareFeedback("Fehler beim Abrufen der Geräte.");
-            this.deviceSelect.innerHTML = '<option disabled selected>Fehler beim Geräten-Laden!</option>';
+            this.showHardwareFeedback("Failed to fetch devices.");
+            this.deviceSelect.innerHTML = '<option disabled selected>Device fetch error.</option>';
         }
     }
     renderDeviceDropdown() {
@@ -142,17 +142,17 @@ class SpotifyR1mote {
             opt.value = "";
             opt.disabled = true;
             opt.selected = true;
-            opt.textContent = "Keine Spotify-Geräte gefunden!";
+            opt.textContent = "No Spotify Connect devices found.";
             this.deviceSelect.appendChild(opt);
             return;
         }
-        this.deviceList.forEach((device, i) => {
+        this.deviceList.forEach(device => {
             const opt = document.createElement("option");
-            opt.value = device.id;
+            opt.value = device.id || "";
             opt.disabled = !!device.is_restricted;
-            opt.innerText = device.name 
-                + (device.is_active ? " (aktiv)" : "")
-                + (device.is_restricted ? " (nicht steuerbar)" : "");
+            opt.innerText = `${device.name} [${device.type}]`
+                + (device.is_active ? " (active)" : "")
+                + (device.is_restricted ? " (not controllable)" : "");
             this.deviceSelect.appendChild(opt);
         });
         this.deviceIndex = 0;
@@ -162,17 +162,26 @@ class SpotifyR1mote {
         if (this.deviceList.length === 0) return;
         this.deviceIndex = index;
         this.currentDeviceId = this.deviceList[index]?.id;
-        this.showHardwareFeedback("Steuerung: " + this.deviceList[index].name);
+        this.showHardwareFeedback("Controlling: " + this.deviceList[index].name);
     }
     async playOnCurrentDevice(endpoint) {
         if (!this.currentDeviceId) {
-            this.showHardwareFeedback("Kein Device gewählt!");
+            this.showHardwareFeedback("No device selected!");
             return;
         }
         await fetch(`https://api.spotify.com/v1/me/player/${endpoint}?device_id=${this.currentDeviceId}`, {
             method: endpoint === "play" || endpoint === "pause" ? "PUT" : "POST",
             headers: { 'Authorization': 'Bearer ' + this.token }
         });
+        // Play/Pause-Icon (UI-Feedback)
+        if (endpoint === "play" && this.playIcon && this.pauseIcon) {
+            this.playIcon.style.display = "none";
+            this.pauseIcon.style.display = "inline";
+            setTimeout(() => {
+                this.playIcon.style.display = "inline";
+                this.pauseIcon.style.display = "none";
+            }, 1100);
+        }
     }
     async togglePlayback() { await this.playOnCurrentDevice("play"); }
     async previousTrack()  { await this.playOnCurrentDevice("previous"); }
@@ -191,9 +200,6 @@ class SpotifyR1mote {
         }, 1500);
     }
 }
-
-// --- Web Playback SDK laden, aber KEINE Player-Registrierung nötig ---
-// (Du bist jetzt reiner Fernbedienungs-Client, kein Playback via SDK!)
 
 document.addEventListener('DOMContentLoaded', async () => {
     const loginBtn = document.getElementById('loginSpotify');
