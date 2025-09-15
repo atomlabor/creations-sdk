@@ -163,15 +163,6 @@ body {
     align-self: flex-end;
 }
 
-.r1-status {
-    background: rgba(0,0,0,0.17);
-    border-radius: 6px;
-    padding: 2px 3px;
-    font-size: 9.6px;
-    min-height: 16px;
-    text-align: center;
-}
-
 .current-song-title {
     font-size: 10.8px;
     font-weight: 600;
@@ -203,11 +194,11 @@ body {
 .hardware-feedback.show { opacity: 1; }
 
 .hardware-legend {
-    font-size: 8.5px;
+    font-size: 8.2px;
     color: #b3fabd;
-    opacity: .68;
+    opacity: .65;
     text-align: center;
-    margin-top: 4.5px;
-    margin-bottom: 2.5px;
+    margin-top: 2.5px;
+    margin-bottom: 1.5px;
     letter-spacing: 0.03em;
 }
