@@ -34,10 +34,10 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 5px 0;
+      padding: 4px;
       font-size: 10px;
       font-weight: bold;
-      background: #1db954;
+      background: rgba(255,255,255,0.1);
       border-radius: 8px 8px 0 0;
     }
     
@@ -45,17 +45,16 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      padding: 8px;
       justify-content: space-between;
+      padding: 6px;
     }
     
     .track-info {
       text-align: center;
-      margin-bottom: 5px;
     }
     
     .track-title {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: bold;
       margin-bottom: 2px;
       white-space: nowrap;
@@ -64,7 +63,7 @@
     }
     
     .track-artist {
-      font-size: 9px;
+      font-size: 8px;
       color: #b3b3b3;
       white-space: nowrap;
       overflow: hidden;
@@ -76,7 +75,7 @@
       justify-content: center;
       align-items: center;
       gap: 8px;
-      margin: 5px 0;
+      margin: 4px 0;
     }
     
     .control-btn {
@@ -84,14 +83,14 @@
       border: none;
       color: #fff;
       font-size: 12px;
-      cursor: pointer;
-      padding: 2px;
-      border-radius: 50%;
       width: 20px;
       height: 20px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s;
     }
     
     .control-btn:hover {
@@ -126,6 +125,25 @@
       border-radius: 1px;
       width: 30%;
     }
+    
+    #recentAlbums {
+      display: flex;
+      gap: 8px;
+      margin: 8px 0 4px 0;
+      justify-content: center;
+    }
+    
+    .album-cover {
+      width: 24px;
+      height: 24px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    
+    .album-cover:hover {
+      opacity: 0.8;
+    }
   </style>
 </head>
 <body>
@@ -150,7 +168,11 @@
         </div>
         <span>3:45</span>
       </div>
+      <div id="recentAlbums" style="display:flex;gap:8px;margin:8px 0 4px 0;justify-content:center;"></div>
     </div>
   </div>
+  
+  <script src="miniplayer.js"></script>
+  <script>fetchAndShowRecentAlbums();</script>
 </body>
 </html>
