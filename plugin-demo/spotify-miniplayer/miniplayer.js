@@ -1,15 +1,14 @@
 // ==== SPOTIFY MINIPLAYER - Rabbit R1 Compatible mit Modern PKCE-Login ====
 // CLIENT_ID und REDIRECT_URI sind App-IDs; jeder meldet sich mit seinem eigenen Spotify-Konto an!
-const SPOTIFY_CLIENT_ID = '38d152037c7f4c5fa831171423f56e4b';
-const SPOTIFY_REDIRECT_URI = 'https://atomlabor.github.io/creations-sdk/plugin-demo/spotify-miniplayer/';
+const SPOTIFY_CLIENT_ID = 'f28477d2f23444739d1f6911c1d6be9d';
+const SPOTIFY_REDIRECT_URI = 'https://atomlabor.github.io/rabbit-spotify-miniplayer/';
 const SPOTIFY_SCOPES = "streaming user-read-email user-read-private user-modify-playback-state user-read-playback-state playlist-read-private";
 
-// === GLOBAL STATE ===
 let spotifyPlayer = null;
 let currentDeviceId = null;
 let isPlaying = false;
 let currentTrack = null;
-let userInteractionDetected = false; // Track whether user has interacted
+let userInteractionDetected = false;
 
 // ==== PKCE HELPER FUNCTIONS ====
 function generateRandomString(length) {
@@ -37,16 +36,22 @@ function setStatus(msg) {
 }
 function showLoginBtn(msg = "") {
   const loginBtn = document.getElementById('loginBtn');
+  const loginSection = document.getElementById('loginSection');
+  const controls = document.getElementById('playerControls');
   if (loginBtn) loginBtn.style.display = "block";
+  if (loginSection) loginSection.style.display = "flex";
+  if (controls) controls.style.display = "none";
   if (msg) setStatus(msg);
 }
 function hideLoginBtn() {
   const loginBtn = document.getElementById('loginBtn');
+  const loginSection = document.getElementById('loginSection');
   if (loginBtn) loginBtn.style.display = "none";
+  if (loginSection) loginSection.style.display = "none";
 }
 function showPlayer() {
   const playerControls = document.getElementById('playerControls');
-  if (playerControls) playerControls.style.display = "block";
+  if (playerControls) playerControls.style.display = "flex";
 }
 function hidePlayer() {
   const playerControls = document.getElementById('playerControls');
@@ -72,7 +77,7 @@ function updateTrackInfo(track) {
 function updatePlayButton() {
   const playBtn = document.getElementById('playPauseBtn');
   if (playBtn) {
-    playBtn.textContent = isPlaying ? '⏸️' : '▶️';
+    playBtn.textContent = isPlaying ? '❚❚' : '►';
     playBtn.title = isPlaying ? 'Pause' : 'Play';
   }
 }
@@ -127,13 +132,12 @@ function handleRedirectCallback() {
         localStorage.removeItem('spotify_code_verifier');
         window.history.replaceState({}, document.title, SPOTIFY_REDIRECT_URI);
         setStatus("Login erfolgreich. Player & Auswahl initialisieren...");
-
-        // === Rabbit R1: Player + Album/Playlist-UI SOFORT anzeigen ===
         hideLoginBtn();
         showPlayer();
         initSpotifyPlayer();
         setupRabbitAlbumPlaylistUI();
-
+        const playHint = document.getElementById('playHint');
+        if (playHint) playHint.style.display = 'block';
       } else {
         console.error('Token exchange failed:', data);
         setStatus("Authorization failed.");
@@ -151,7 +155,7 @@ function handleRedirectCallback() {
   return false;
 }
 
-// === DEVICE ACTIVATION ===
+// === DEVICE ACTIVATION (Rabbit Fix: No Autoplay) ===
 function transferPlaybackHere(device_id, token) {
   fetch('https://api.spotify.com/v1/me/player', {
     method: "PUT",
@@ -161,18 +165,8 @@ function transferPlaybackHere(device_id, token) {
     },
     body: JSON.stringify({
       device_ids: [device_id],
-      play: true // never autoplay - only after touch
+      play: false // NIE autom. Autoplay! User-Tap nötig für Dauer-Playback.
     })
-  })
-  .then(response => {
-    if (response.ok) {
-      setStatus("Device aktiviert.");
-    } else {
-      console.warn('Device activation response:', response.status);
-    }
-  })
-  .catch(error => {
-    console.error('Device activation error:', error);
   });
 }
 
@@ -202,7 +196,9 @@ function initSpotifyPlayer() {
 
       setTimeout(() => {
         transferPlaybackHere(device_id, token);
-        setStatus("Ready to play!");
+        setStatus("Bereit zum Abspielen!");
+        const playHint = document.getElementById('playHint');
+        if (playHint) playHint.style.display = 'block';
       }, 1200); // 1.2s delay
     });
     spotifyPlayer.addListener('not_ready', ({ device_id }) => {
@@ -253,24 +249,8 @@ window.togglePlayback = function() {
     console.error('Error toggling playback:', error);
   });
 };
-window.nextTrack = function() {
-  if (!spotifyPlayer) return;
-  spotifyPlayer.nextTrack().then(() => {
-    console.log('Skipped to next track');
-  }).catch(error => {
-    console.error('Error skipping track:', error);
-  });
-};
-window.previousTrack = function() {
-  if (!spotifyPlayer) return;
-  spotifyPlayer.previousTrack().then(() => {
-    console.log('Skipped to previous track');
-  }).catch(error => {
-    console.error('Error going to previous track:', error);
-  });
-};
 
-// === RABBIT R1 COMFORT PATCH: Album- & Playlist-Auswahl, Player immer sichtbar ===
+// Playlist-/Album-/Track-Auswahl & Playback:
 async function fetchSpotify(url) {
   const token = localStorage.getItem('spotify_access_token');
   const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
@@ -316,36 +296,57 @@ async function populateTrackList(type, id) {
     const li = document.createElement('li');
     li.textContent = `${tr.name} – ${(tr.artists[0]?.name || '')}`;
     li.className = 'touchListItem';
-    li.style.padding = '1rem';
-    li.style.fontSize = '1.1rem';
-    li.style.background = '#212121';
+    li.style.padding = '7px';
+    li.style.fontSize = '0.92rem';
+    li.style.background = '#232323';
     li.style.marginBottom = '2px';
-    li.style.borderRadius = '1rem';
+    li.style.borderRadius = '9px';
     li.style.cursor = 'pointer';
-    li.onclick = () => playTrackURI(tr.uri);
+    // Playtrack per User-Tap
+    li.onclick = () => {
+      playTrackURI(tr.uri);
+      setStatus("Wiedergabe gestartet [" + tr.name + "]");
+      const hint = document.getElementById('playHint');
+      if(hint) hint.style.display = 'none';
+    };
     ul.appendChild(li);
   });
 }
+
+// User-Tap ist Pflicht für dauerhafte Wiedergabe!
 async function playTrackURI(uri) {
   const token = localStorage.getItem('spotify_access_token');
   await fetch('https://api.spotify.com/v1/me/player/play', {
     method: 'PUT',
-    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/json'
+    },
     body: JSON.stringify({ uris: [uri] })
   });
 }
-async function setupRabbitAlbumPlaylistUI() {
-  await populatePlaylists();
-  await populateAlbums();
-  const playlistSelect = document.getElementById('playlistSelect');
-  if (playlistSelect && playlistSelect.value) populateTrackList('playlist', playlistSelect.value);
-}
+
+// Touch-freundliche Controls & Eventhandler
 document.addEventListener('DOMContentLoaded', function() {
+  const loginBtn = document.getElementById('loginBtn');
+  if (loginBtn) loginBtn.onclick = window.doLoginFlow;
+  const playBtn = document.getElementById('playPauseBtn');
+  if (playBtn) playBtn.onclick = function() {
+    userInteractionDetected = true;
+    if (spotifyPlayer) spotifyPlayer.togglePlay();
+    const hint = document.getElementById('playHint');
+    if(hint) hint.style.display = 'none';
+  };
+  const nextBtn = document.getElementById('nextBtn');
+  if (nextBtn) nextBtn.onclick = window.nextTrack;
+  const prevBtn = document.getElementById('prevBtn');
+  if (prevBtn) prevBtn.onclick = window.previousTrack;
   const playlistSel = document.getElementById('playlistSelect');
   if (playlistSel) playlistSel.onchange = function() { populateTrackList('playlist', this.value); };
   const albumSel = document.getElementById('albumSelect');
   if (albumSel) albumSel.onchange = function() { populateTrackList('album', this.value); };
-  // === Initialisierung / Login-Handling ===
+
+  // Init nach Login
   if (!handleRedirectCallback()) {
     const token = localStorage.getItem('spotify_access_token');
     if (token) {
@@ -353,26 +354,28 @@ document.addEventListener('DOMContentLoaded', function() {
       showPlayer();
       initSpotifyPlayer();
       setupRabbitAlbumPlaylistUI();
+      const playHint = document.getElementById('playHint');
+      if (playHint) playHint.style.display = 'block';
     } else {
       showLoginBtn("Sign in with your Spotify Premium account.");
     }
   }
 });
-// === CLEANUP ===
+
+async function setupRabbitAlbumPlaylistUI() {
+  await populatePlaylists();
+  await populateAlbums();
+  const playlistSelect = document.getElementById('playlistSelect');
+  if (playlistSelect && playlistSelect.value) populateTrackList('playlist', playlistSelect.value);
+}
+
+// Weiter- und Zurücktrack
+window.nextTrack = function() { if (spotifyPlayer) spotifyPlayer.nextTrack(); };
+window.previousTrack = function() { if (spotifyPlayer) spotifyPlayer.previousTrack(); };
+
+// CLEANUP
 window.addEventListener('beforeunload', function() {
   if (spotifyPlayer) {
     spotifyPlayer.disconnect();
   }
 });
-
-/*
- * SECURITY NOTES:
- * - CLIENT_ID und REDIRECT_URI sind KEINE geheimen Userdaten!
- * - Jeder Nutzer gibt auf der Spotify Loginseite seinen eigenen Premium-Account ein.
- * - Zugriffstoken sind nur für die eigene Session/den eigenen Account gültig.
- * - PKCE flow ensures secure authorization without client secrets.
- *
- * RABBIT R1 KOMFORT:
- * - Album- & Playlistauswahl, sofort sichtbares UI nach Login
- * - Touchoptimierte Trackliste, große Controls, kein Umschalten nötig
- */
