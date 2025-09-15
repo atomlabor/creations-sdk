@@ -9,40 +9,88 @@ const SPOTIFY_SCOPES = [
     'user-library-read',
     'streaming'
 ];
+
+// PKCE helper functions
+function generateCodeVerifier() {
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+    const randomValues = crypto.getRandomValues(new Uint8Array(64));
+    return randomValues.reduce((acc, x) => acc + possible[x % possible.length], '');
+}
+
+async function generateCodeChallenge(codeVerifier) {
+    const data = new TextEncoder().encode(codeVerifier);
+    const digest = await crypto.subtle.digest('SHA-256', data);
+    return btoa(String.fromCharCode.apply(null, new Uint8Array(digest)))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+}
+
 function getAccessToken() {
-    // Token aus URL-Hash ziehen
-    if(window.location.hash) {
-        const hash = window.location.hash.substring(1).split('&').reduce((acc, cur) => {
-            const [key, value] = cur.split('=');
-            acc[key] = value;
-            return acc;
-        }, {});
-        if(hash.access_token) {
-            window.localStorage.setItem('spotify_token', hash.access_token);
-            window.location.hash = '';
-        }
+    // Check for existing token first
+    const existingToken = window.localStorage.getItem('spotify_token');
+    if (existingToken) return existingToken;
+    
+    // Check for authorization code in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    
+    if (code) {
+        // Exchange code for token
+        exchangeCodeForToken(code);
     }
-    return window.localStorage.getItem('spotify_token');
+    
+    return null;
 }
-function loginWithSpotify() {
-    const clientId = 'f28477d2f23444739d1f6911c1d6be9d';
-    const redirectUri = 'https://atomlabor.github.io/rabbit-r1-apps/plugin-demo/spotify-miniplayer/';
-    const scopes = [
-        'user-read-playback-state',
-        'user-modify-playback-state',
-        'user-read-currently-playing',
-        'playlist-read-private',
-        'user-library-read',
-        'streaming'
-    ];
-    const url = 'https://accounts.spotify.com/authorize' +
-      '?response_type=token' +                         // << HIER: "token" und nichts anderes
-      '&client_id=' + encodeURIComponent(clientId) +
-      '&redirect_uri=' + encodeURIComponent(redirectUri) +
-      '&scope=' + encodeURIComponent(scopes.join(' '));
+
+async function exchangeCodeForToken(code) {
+    const codeVerifier = localStorage.getItem('code_verifier');
+    
+    const response = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            client_id: SPOTIFY_CLIENT_ID,
+            grant_type: 'authorization_code',
+            code: code,
+            redirect_uri: SPOTIFY_REDIRECT_URI,
+            code_verifier: codeVerifier,
+        }),
+    });
+    
+    const data = await response.json();
+    if (data.access_token) {
+        localStorage.setItem('spotify_token', data.access_token);
+        localStorage.removeItem('code_verifier');
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        // Reload to initialize with token
+        window.location.reload();
+    }
+}
+
+async function loginWithSpotify() {
+    const codeVerifier = generateCodeVerifier();
+    const codeChallenge = await generateCodeChallenge(codeVerifier);
+    
+    localStorage.setItem('code_verifier', codeVerifier);
+    
+    const params = new URLSearchParams({
+        response_type: 'code',
+        client_id: SPOTIFY_CLIENT_ID,
+        scope: SPOTIFY_SCOPES.join(' '),
+        redirect_uri: SPOTIFY_REDIRECT_URI,
+        code_challenge_method: 'S256',
+        code_challenge: codeChallenge,
+    });
+    
+    const url = `https://accounts.spotify.com/authorize?${params}`;
     console.log('Spotify Login URL:', url);
-    window.location = url;
+    window.location.href = url;
 }
+
 // --- SPOTIFY MINIPLAYER-CLASS ---
 class SpotifyMiniplayerR1 {
     constructor(token) {
