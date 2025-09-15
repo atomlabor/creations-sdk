@@ -272,13 +272,13 @@ class SpotifyMiniplayerR1 {
             albumItem.className = 'album-item';
             albumItem.dataset.index = index;
             albumItem.tabIndex = 0;
-            albumItem.innerHTML = `
-                <img alt="${album.title}"/>
-                <div class="album-info">
-                    <div class="album-title">${album.title}</div>
-                    <div class="album-artist">${album.artist}</div>
-                </div>
-            `;
+albumItem.innerHTML = `
+    <img src="${album.artwork}" alt="${album.title}"/>
+    <div class="album-info">
+        <div class="album-title">${album.title}</div>
+        <div class="album-artist">${album.artist}</div>
+    </div>
+`;
             albumItem.addEventListener('click', () => {
                 this.currentFocus = index;
                 this.selectAlbum(index);
