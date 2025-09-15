@@ -1,172 +1,233 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
   <title>Rabbit R1 Spotify Miniplayer</title>
   <style>
     html, body {
-      width: 100vw; min-width: 180px; max-width: 350px;
-      height: 100vh; min-height: 190px; max-height: 340px;
+      width: 360px; /* Rabbit R1 display width */
+      height: 640px; /* Rabbit R1 display height */
       margin: 0; padding: 0; box-sizing: border-box;
       background: #181818; color: #fff;
       font-family: system-ui, sans-serif;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
+      overflow: hidden;
     }
+    
     #playerControls {
-      width: 100vw; max-width: 240px; min-width: 170px;
-      height: 100vw; max-height: 230px; min-height: 160px;
+      width: 340px; /* Touch-optimized width with margins */
+      height: 600px; /* Touch-optimized height */
       box-sizing: border-box;
       background: #181818;
-      border-radius: 14px;
-      padding: 2vw 2vw 2vw 2vw;
+      border-radius: 12px;
+      padding: 16px;
       display: none; /* Show nach Login */
       flex-direction: column;
       align-items: center;
-      overflow: hidden;
-      margin: 0 auto;
+      justify-content: space-between;
+      margin: 20px auto;
     }
+    
     #loginSection {
-      width: 100vw; max-width: 240px; min-width: 170px;
-      height: 100vw; max-height: 230px; min-height: 160px;
+      width: 340px;
+      height: 600px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      padding: 16px;
+      box-sizing: border-box;
     }
-    #loginBtn {
-      width: 86%; min-width: 90px; max-width:210px;
-      height: 2.1em; border-radius: 10px;
-      font-size: 1em; font-weight: 600;
-      background: #1db954; color: #191414;
-      border: none; margin: 10px auto 0 auto;
-      cursor: pointer; display: block;
-      box-shadow: 0 2px 8px #1db95423;
-      transition: background 0.12s;
+    
+    /* Album cover area */
+    .album-cover {
+      width: 280px;
+      height: 280px;
+      border-radius: 8px;
+      background: #333;
+      margin-bottom: 20px;
+      flex-shrink: 0;
     }
-    .login-hint {
-      text-align: center; font-size: 0.97em;
-      color: #b3b3b3; padding: 8px 1vw 0 1vw;
-      line-height: 1.14;
+    
+    /* Song info area */
+    .song-info {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 20px;
+      flex-shrink: 0;
     }
-    #albumArt {
-      width: 25vw; max-width: 64px; min-width:36px;
-      height: 25vw; max-height: 64px; min-height:36px;
-      margin: 2px auto 1px auto;
-      border-radius: 9px; display: block;
-      box-shadow: 0 0 5px #222; background: #232323;
+    
+    .song-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .track-info {
-      text-align: center; width: 98%; margin:0;
-      min-height: 14px;
+    
+    .song-artist {
+      font-size: 14px;
+      color: #b3b3b3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    #trackName {
-      font-size: .95em; font-weight:600; margin-bottom:1px;
-      max-width:95%; white-space:nowrap; overflow:hidden;text-overflow:ellipsis;
+    
+    /* Progress bar area */
+    .progress-section {
+      width: 100%;
+      margin-bottom: 24px;
+      flex-shrink: 0;
     }
-    #artistName {
-      font-size: .74em; color: #b3b3b3;
-      max-width:95%; white-space:nowrap; overflow:hidden;text-overflow:ellipsis;
+    
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #404040;
+      border-radius: 3px;
+      margin: 12px 0;
+      position: relative;
+      cursor: pointer;
     }
+    
+    .progress-fill {
+      height: 100%;
+      background: #1db954;
+      border-radius: 3px;
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+    
+    .time-display {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #b3b3b3;
+    }
+    
+    /* Control buttons */
     .controls {
-      display: flex; justify-content: center; align-items: center;
-      gap: 4vw; margin: 2vw 0 1vw 0; width: 98vw; max-width:200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      width: 100%;
+      flex-shrink: 0;
     }
+    
     .control-btn {
-      width: 7vw; min-width:18px; max-width:30px;
-      height: 7vw; min-height:18px; max-height:30px;
-      border-radius: 5px; background: #232323;
-      color: #fff; border: none; font-size: 1.15em; font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; outline: none; transition: background 0.1s;
-      padding: 0;
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      padding: 12px;
+      border-radius: 50%;
+      transition: background-color 0.2s;
+      touch-action: manipulation;
     }
-    .control-btn:active { background: #1db954; color:#191414; }
-    #playPauseBtn {
-      width: 9vw; max-width:36px; min-width:22px;
-      height: 9vw; max-height:36px; min-height:22px;
-      border-radius: 7px; background: #1db954; color: #191414;
-      font-size: 1.2em; font-weight: 700;
-      padding: 0; margin: 0 1vw;
-      display: flex; align-items: center; justify-content: center;
-      border:none;
+    
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
     }
-    #playPauseBtn:active { background: #1ed760; }
-    #playIcon {font-size: 1em; display:inline;}
-    #pauseIcon {display:none;}
-    #pauseIcon svg {vertical-align: middle;}
-    #selectionPanel {
-      width: 97%; display: flex; flex-direction: column; gap: 1vw;
-      margin: 0; align-items: center;
+    
+    .control-btn.small {
+      font-size: 24px;
+      width: 48px;
+      height: 48px;
     }
-    #playlistSelect, #albumSelect {
-      font-size: .85em; padding: 1px 3px;
-      border-radius: 6px; width: 99%; background: #222; color: #fff;
-      border: 1px solid #333; margin-bottom: 0.5vw; margin-top: 0.5vw;
-      min-height: 1.9em;
-      max-width: 220px;
+    
+    .control-btn.large {
+      font-size: 36px;
+      width: 64px;
+      height: 64px;
+      background: #1db954;
     }
-    #trackList {
-      list-style: none; padding: 0; margin: 0 0 0.5vw 0;
-      width: 99%; max-height: 18vw; min-height: 1vw; overflow-y: auto;
+    
+    .control-btn.large:hover {
+      background: #1ed760;
     }
-    .touchListItem {
-      font-size: .72em; padding: 2.5px 1vw;
-      margin-bottom: 0.5px; border-radius: 4px; background: #232323;
-      color: #fff; cursor: pointer; outline: none;
+    
+    /* Login button */
+    .login-btn {
+      background: #1db954;
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      touch-action: manipulation;
     }
-    .touchListItem:active, .touchListItem:focus { background: #1db954 !important; color:#191414;}
-    #status {
-      min-height: 10px; text-align: center; color: #88b;
-      font-size: .8em; margin: 0.5vw 0 0.3vw 0; width:99%;
-    }
-    #playHint {
-      color:#1db954; text-align:center; font-size:.74em; margin:1vw 0 0 0;
-    }
-    @media (max-width: 250px) {
-      #playerControls, #loginSection, html, body {width: 100vw; height: 100vh;}
-      #selectionPanel{width:98vw}
+    
+    .login-btn:hover {
+      background: #1ed760;
     }
   </style>
 </head>
 <body>
   <div id="loginSection">
-    <div class="login-hint">
-      <strong>Spotify Premium benötigt</strong><br>
-      Verbinde dein Spotify-Konto, um Musik auf dem Rabbit R1 zu hören.
-    </div>
-    <button id="loginBtn">Mit Spotify verbinden</button>
+    <h1 style="text-align: center; margin-bottom: 32px; font-size: 24px;">Spotify Miniplayer</h1>
+    <p style="text-align: center; margin-bottom: 32px; color: #b3b3b3;">Für Rabbit R1 optimiert</p>
+    <button class="login-btn" onclick="loginWithSpotify()">Mit Spotify anmelden</button>
   </div>
+  
   <div id="playerControls">
-    <img id="albumArt" src="" alt="Album Art">
-    <div class="track-info">
-      <div id="trackName">No track selected</div>
-      <div id="artistName"></div>
+    <div class="album-cover" id="albumCover"></div>
+    
+    <div class="song-info">
+      <div class="song-title" id="songTitle">Song Title</div>
+      <div class="song-artist" id="songArtist">Artist Name</div>
     </div>
+    
+    <div class="progress-section">
+      <div class="progress-bar" onclick="seekTo(event)">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="time-display">
+        <span id="currentTime">0:00</span>
+        <span id="totalTime">0:00</span>
+      </div>
+    </div>
+    
     <div class="controls">
-      <button class="control-btn" id="prevBtn" title="Zurück">&#9198;</button>
-      <button class="control-btn" id="playPauseBtn" title="Play/Pause">
-        <span id="playIcon">&#9654;</span>
-        <span id="pauseIcon"><svg width="13" height="13" viewBox="0 0 13 13"><rect x="2" y="2" width="3" height="9" fill="#191414"/><rect x="8" y="2" width="3" height="9" fill="#191414"/></svg></span>
-      </button>
-      <button class="control-btn" id="nextBtn" title="Weiter">&#9197;</button>
+      <button class="control-btn small" onclick="previousTrack()">⏮</button>
+      <button class="control-btn large" id="playPauseBtn" onclick="togglePlayPause()">▶</button>
+      <button class="control-btn small" onclick="nextTrack()">⏭</button>
     </div>
-    <div id="selectionPanel">
-      <select id="playlistSelect"></select>
-      <select id="albumSelect"></select>
-    </div>
-    <ul id="trackList"></ul>
-    <div id="status"></div>
-    <div id="playHint">➔ Bitte Song auswählen oder den Play-Button nutzen!</div>
   </div>
+
   <script>
-    // Minimal JS-Helper für Play/Pause-Icon
-    function updatePlayPauseIcon(isPlaying) {
-      document.getElementById('playIcon').style.display = isPlaying ? 'none':'inline';
-      document.getElementById('pauseIcon').style.display = isPlaying ? 'inline':'none';
+    // Placeholder functions for Spotify integration
+    function loginWithSpotify() {
+      // Simulate login success
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('playerControls').style.display = 'flex';
     }
-    // Im player_state_changed und Play/Pause-Aufruf aktivieren!
+    
+    function togglePlayPause() {
+      const btn = document.getElementById('playPauseBtn');
+      btn.textContent = btn.textContent === '▶' ? '⏸' : '▶';
+    }
+    
+    function previousTrack() {
+      console.log('Previous track');
+    }
+    
+    function nextTrack() {
+      console.log('Next track');
+    }
+    
+    function seekTo(event) {
+      const progressBar = event.currentTarget;
+      const clickX = event.offsetX;
+      const width = progressBar.offsetWidth;
+      const percentage = (clickX / width) * 100;
+      document.getElementById('progressFill').style.width = percentage + '%';
+    }
   </script>
-  <script src="miniplayer.js"></script>
 </body>
 </html>
