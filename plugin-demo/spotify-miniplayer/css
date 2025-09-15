@@ -1,201 +1,175 @@
-/* Rabbit R1 Miniplayer Styles */
+body {
+    margin: 0;
+    padding: 0;
+    background: #11110f;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
 .r1-app-container {
     width: 240px;
     height: 282px;
-    background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
-    border-radius: 12px;
-    padding: 8px;
+    background: #181818;
+    border-radius: 13px;
+    margin: 8px auto 0 auto;
+    padding: 10px 8px 8px 8px;
     box-sizing: border-box;
     font-family: 'SF Pro Display', -apple-system, sans-serif;
     color: white;
-    overflow: hidden;
-}
-
-.miniplayer-container {
-    height: 100%;
+    box-shadow: 0 4px 18px rgba(42,128,68,0.18);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    justify-content: space-between;
 }
-
+.miniplayer-container {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    justify-content: flex-start;
+}
 .current-track {
-    background: rgba(0,0,0,0.3);
+    background: linear-gradient(110deg, #23271d15 0%, #37c97d1e 100%);
     border-radius: 8px;
-    padding: 8px;
+    padding: 7px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    min-height: 60px;
+    gap: 7px;
 }
-
 .track-artwork img {
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
     border-radius: 6px;
     object-fit: cover;
+    background: #242926;
+    border: 1.2px solid #19c35516;
 }
-
 .track-info {
-    flex: 1;
+    flex: 1 1 auto;
     overflow: hidden;
+    min-width: 0;
 }
-
 .track-title {
-    font-size: 11px;
+    font-size: 12.5px;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 2px;
+    margin-bottom: 0.5px;
 }
-
 .track-artist {
-    font-size: 9px;
-    opacity: 0.8;
+    font-size: 10px;
+    color: #cee3ce;
+    opacity: 0.90;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-bottom: 2.5px;
 }
-
+#deviceSelect {
+    border: 1.2px solid #23a94b58;
+    background: rgba(30,40,30,0.21);
+    color: #fff;
+    border-radius: 6px;
+    width: 100%;
+    font-size: 10.5px;
+    padding: 3.5px 3px;
+    outline: none;
+    margin-bottom: 0;
+    margin-top: 1.5px;
+}
+#deviceSelect option:disabled {
+    opacity: .65; color: #acffcf;
+}
+.about-tiny {
+    font-size: 9.3px;
+    color: #d6fff2;
+    opacity: 0.80;
+    text-align: left;
+    padding-top: 4px;
+    line-height: 1.22;
+    margin-left: 1px;
+    margin-bottom: 0;
+}
 .player-controls {
     display: flex;
     justify-content: center;
-    gap: 12px;
-    padding: 4px 0;
+    gap: 10px;
+    padding: 10px 0 2px 0;
 }
-
 .control-btn {
-    background: rgba(255,255,255,0.2);
+    background: rgba(55,255,110,0.13);
     border: none;
-    border-radius: 20px;
+    border-radius: 17px;
     color: white;
-    font-size: 14px;
-    width: 36px;
-    height: 36px;
+    width: 39px;
+    height: 39px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.18s, transform 0.13s;
 }
-
-.control-btn:hover,
-.control-btn:focus {
-    background: rgba(255,255,255,0.3);
-    transform: scale(1.1);
-    outline: none;
+.control-btn svg {
+    width: 22px;
+    height: 22px;
+    display: block;
+    pointer-events: none;
 }
-
 .control-btn.primary {
-    background: rgba(255,255,255,0.9);
-    color: #1db954;
-    font-weight: bold;
-}
-
-.recent-albums {
-    flex: 1;
-    background: rgba(0,0,0,0.2);
-    border-radius: 8px;
-    padding: 6px;
-    overflow: hidden;
-}
-
-.albums-header {
-    font-size: 9px;
+    background: #1db954;
+    color: #fff;
     font-weight: 600;
-    margin-bottom: 6px;
-    opacity: 0.9;
 }
-
-.albums-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    max-height: 90px;
-    overflow-y: auto;
-}
-
-.album-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 6px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.2s ease;
-    font-size: 8px;
-}
-
-.album-item:hover,
-.album-item:focus {
-    background: rgba(255,255,255,0.1);
+.control-btn:active, .control-btn:focus {
+    background: #25be635c;
     outline: none;
+    transform: scale(1.07);
 }
-
-.album-item.focused {
-    background: rgba(255,255,255,0.2);
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.3);
+#loginSpotify {
+    margin-top: 0;
+    width: 100%;
+    border-radius: 7px;
+    font-size: 11.8px;
+    font-weight: bold;
+    background: #1db954;
+    color: #fff;
+    border: none;
+    padding: 10px 0;
+    cursor: pointer;
+    box-shadow: 0 1px 4px #1271301a;
+    align-self: flex-end;
 }
-
-.album-item img {
-    width: 24px;
-    height: 24px;
-    border-radius: 3px;
-    object-fit: cover;
-}
-
-.album-info {
-    flex: 1;
-    overflow: hidden;
-}
-
-.album-title {
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.2;
-}
-
-.album-artist {
-    opacity: 0.7;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 7px;
-    line-height: 1.1;
-}
-
 .r1-status {
-    background: rgba(0,0,0,0.4);
+    background: rgba(0,0,0,0.17);
     border-radius: 6px;
-    padding: 3px 6px;
+    padding: 2px 3px;
+    font-size: 9.6px;
+    min-height: 16px;
     text-align: center;
 }
-
-.status-text {
-    font-size: 7px;
-    opacity: 0.8;
-    font-weight: 400;
-}
-
-/* R1 Hardware Feedback */
 .hardware-feedback {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(0,0,0,0.8);
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 10px;
+    background: rgba(0,0,0,0.91);
+    color: #baf2ce;
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 11px;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.18s;
     pointer-events: none;
-    z-index: 100;
+    z-index: 200;
 }
-
-.hardware-feedback.show {
-    opacity: 1;
+.hardware-feedback.show { opacity: 1; }
+.hardware-legend {
+    font-size: 8.5px;
+    color: #b3fabd;
+    opacity: .68;
+    text-align: center;
+    margin-top: 4.5px;
+    margin-bottom: 2.5px;
+    letter-spacing: 0.03em;
 }
